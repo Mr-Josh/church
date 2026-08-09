@@ -10,7 +10,12 @@ require __DIR__ . '/../src/router.php';
 require __DIR__ . '/../src/admin.php';
 require __DIR__ . '/../src/admin_crud.php';
 
-header('Access-Control-Allow-Origin: ' . $config['cors_origin']);
+$corsOrigin = $config['cors_origin'] ?? null;
+if (!$corsOrigin) {
+    $corsOrigin = 'http://localhost:5173';
+}
+
+header('Access-Control-Allow-Origin: ' . $corsOrigin);
 header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS');
