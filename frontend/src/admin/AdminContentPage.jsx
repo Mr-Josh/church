@@ -3,32 +3,5 @@ import { Link, useNavigate } from 'react-router-dom';
 import { churchApi } from '../services/churchApi';
 import './admin.css';
 
-const sections = [
-  ['Ministères', 'Organisez les ministères et leurs descriptions.', '/admin/ministries', '⌂'],
-  ['Programmes', 'Gérez les horaires et rendez-vous réguliers.', '/admin/programs', '◷'],
-  ['Événements', 'Publiez les prochains temps forts de l’église.', '/admin/events', '▣'],
-  ['Témoignages', 'Consultez et modérez les témoignages reçus.', '/admin/testimonials', '▱'],
-];
-
-export default function AdminContentPage() {
-  const navigate = useNavigate();
-  return <div className="admin-shell">
-    <aside className="admin-sidebar">
-      <Link to="/" className="admin-brand"><span className="brand-mark">G+</span><span><strong>GOSPEL BREAK</strong><small>CHAIN MINISTRY</small></span></Link>
-      <span className="sidebar-caption">ADMINISTRATION</span>
-      <nav>
-        <Link className="sidebar-link" to="/admin"><i>⌂</i><span>Dashboard</span></Link>
-        <Link className="sidebar-link" to="/admin/prayer-requests"><i>◉</i><span>Demandes de prière</span></Link>
-        <Link className="sidebar-link" to="/admin/help-requests"><i>♡</i><span>Demandes d’aide</span></Link>
-        <Link className="sidebar-link" to="/admin/testimonials"><i>▱</i><span>Témoignages</span></Link>
-        <Link className="sidebar-link active" to="/admin/content"><i>▤</i><span>Contenu du site</span></Link>
-        <Link className="sidebar-link" to="/admin/settings"><i>⌂</i><span>Église</span></Link>
-      </nav>
-      <button className="admin-logout" onClick={async () => { await churchApi.logout(); navigate('/admin/login'); }}><i>↪</i><span>Déconnexion</span></button>
-    </aside>
-    <main className="admin-main">
-      <header className="admin-header"><div><p className="dashboard-eyebrow">ADMINISTRATION</p><h1>Contenu du site</h1><p>Gérez les éléments visibles sur le site public.</p></div><Link to="/admin" className="btn outline">← Dashboard</Link></header>
-      <section className="content-hub-grid">{sections.map(([title, description, to, icon]) => <Link className="content-hub-card" to={to} key={title}><span>{icon}</span><div><h2>{title}</h2><p>{description}</p></div><b>→</b></Link>)}</section>
-    </main>
-  </div>;
-}
+const sections=[['Ministères','Organisez les ministères et leurs descriptions.','/admin/ministries','⌂'],['Programmes','Gérez les horaires et rendez-vous réguliers.','/admin/programs','◷'],['Événements','Publiez les prochains temps forts de l’église.','/admin/events','▣'],['Témoignages','Consultez et modérez les témoignages reçus.','/admin/testimonials','▱']];
+export default function AdminContentPage(){const navigate=useNavigate();return <div className="admin-shell"><style>{`.content-hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.content-hub-card{min-height:150px;background:#fff;border:1px solid #e8edf3;border-radius:12px;padding:22px;display:flex;align-items:center;gap:16px;text-decoration:none;color:#10233f;box-shadow:0 8px 24px rgba(14,35,61,.035);transition:.18s ease}.content-hub-card:hover{transform:translateY(-2px);border-color:#d6a52f}.content-hub-card>span{width:50px;height:50px;border-radius:12px;background:#fff4dc;color:#bd8611;display:grid;place-items:center;font-size:22px}.content-hub-card div{flex:1}.content-hub-card h2{font:700 18px Georgia,serif;color:#061b35;margin:0 0 7px}.content-hub-card p{font-size:10px;line-height:1.6;color:#8490a0;margin:0}.content-hub-card>b{font-size:21px;color:#c28b16}@media(max-width:700px){.content-hub-grid{grid-template-columns:1fr}}`}</style><aside className="admin-sidebar"><Link to="/" className="admin-brand"><span className="brand-mark">G+</span><span><strong>GOSPEL BREAK</strong><small>CHAIN MINISTRY</small></span></Link><span className="sidebar-caption">ADMINISTRATION</span><nav><Link className="sidebar-link" to="/admin"><i>⌂</i><span>Dashboard</span></Link><Link className="sidebar-link" to="/admin/prayer-requests"><i>◉</i><span>Demandes de prière</span></Link><Link className="sidebar-link" to="/admin/help-requests"><i>♡</i><span>Demandes d’aide</span></Link><Link className="sidebar-link" to="/admin/testimonials"><i>▱</i><span>Témoignages</span></Link><Link className="sidebar-link active" to="/admin/content"><i>▤</i><span>Contenu du site</span></Link><Link className="sidebar-link" to="/admin/settings"><i>⌂</i><span>Église</span></Link></nav><button className="admin-logout" onClick={async()=>{await churchApi.logout();navigate('/admin/login')}}><i>↪</i><span>Déconnexion</span></button></aside><main className="admin-main"><header className="admin-header"><div><p className="dashboard-eyebrow">ADMINISTRATION</p><h1>Contenu du site</h1><p>Gérez les éléments visibles sur le site public.</p></div><Link to="/admin" className="btn outline">← Dashboard</Link></header><section className="content-hub-grid">{sections.map(([title,description,to,icon])=><Link className="content-hub-card" to={to} key={title}><span>{icon}</span><div><h2>{title}</h2><p>{description}</p></div><b>→</b></Link>)}</section></main></div>}
