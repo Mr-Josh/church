@@ -1,37 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { churchApi } from '../services/churchApi';
-
-const sections = [
-  ['Ministères', 'ministries'], ['Programmes', 'programs'], ['Événements', 'events'],
-  ['Prédications', 'sermons'], ['Galerie', 'gallery'], ['Témoignages', 'testimonials'],
-  ['Demandes de prière', 'prayer-requests'], ['Demandes d’aide', 'help-requests'],
-];
-
-export default function AdminDashboard() {
-  const navigate = useNavigate();
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    churchApi.getAdminDashboard().then(setData).catch(() => navigate('/admin/login'));
-  }, [navigate]);
-  const logout = async () => { await churchApi.logout(); navigate('/admin/login'); };
-  const counts = data?.counts || {};
-  return <div className="admin-shell">
-    <aside className="admin-sidebar">
-      <Link to="/" className="admin-brand">Gospel Break Chain Ministry</Link>
-      <nav>
-        <Link className="active" to="/admin">Dashboard</Link>
-        {sections.map(([label, key]) => <Link key={key} to={`/admin/${key}`}>{label}</Link>)}
-        <Link to="/admin/settings">Informations de l’église</Link>
-      </nav>
-      <button className="admin-logout" onClick={logout}>Déconnexion</button>
-    </aside>
-    <main className="admin-main">
-      <header className="admin-header"><div><p className="eyebrow">ADMINISTRATION</p><h1>Tableau de bord</h1></div><Link to="/" className="btn outline">Voir le site →</Link></header>
-      <section className="admin-grid">
-        {sections.map(([label, key]) => <Link className="admin-card" to={`/admin/${key}`} key={key}><span>{counts[key] ?? 0}</span><strong>{label}</strong><small>Gérer →</small></Link>)}
-      </section>
-      <section className="admin-panel"><h2>Vue d’ensemble</h2><p>Publiez et mettez à jour les contenus du site. Les demandes des visiteurs arrivent ici pour traitement par le pasteur.</p></section>
-    </main>
-  </div>;
-}
+const sections=[['Ministères','ministries'],['Programmes','programs'],['Événements','events'],['Prédications','sermons'],['Galerie','gallery'],['Témoignages','testimonials'],['Demandes de prière','prayer-requests'],['Demandes d’aide','help-requests']];
+export default function AdminDashboard(){const navigate=useNavigate();const[data,setData]=useState(null);const[error,setError]=useState('');useEffect(()=>{churchApi.admin.dashboard().then(r=>setData(r.data||r)).catch(e=>{setError(e.message);navigate('/admin/login');});},[navigate]);const logout=async()=>{await churchApi.logout();navigate('/admin/login')};const counts=data?.counts||{};return <div className="admin-shell"><aside className="admin-sidebar"><Link to="/" className="admin-brand">Gospel Break Chain Ministry</Link><nav><Link className="active" to="/admin">Dashboard</Link>{sections.map(([label,key])=><Link key={key} to={`/admin/${key}`}>{label}</Link>)}<Link to="/admin/settings">Informations de l’église</Link></nav><button className="admin-logout" onClick={logout}>Déconnexion</button></aside><main className="admin-main"><header className="admin-header"><div><p className="eyebrow">ADMINISTRATION</p><h1>Tableau de bord</h1></div><Link to="/" className="btn outline">Voir le site →</Link></header>{error&&<div className="form-error">{error}</div>}<section className="admin-grid">{sections.map(([label,key])=><Link className="admin-card" to={`/admin/${key}`} key={key}><span>{counts[key]??0}</span><strong>{label}</strong><small>Gérer →</small></Link>)}</section><section className="admin-panel"><h2>Vue d’ensemble</h2><p>Publiez et mettez à jour les contenus du site. Les demandes des visiteurs arrivent ici pour traitement par le pasteur.</p></section></main></div>}
