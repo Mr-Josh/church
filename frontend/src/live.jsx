@@ -4,7 +4,7 @@ import { BrowserRouter, Link, Route, Routes, useLocation, useNavigate } from 're
 import './styles.css';
 import { churchApi } from './services/churchApi';
 
-const WA='https://wa.me/237600000000';
+const WA='https://wa.me/237690558623';
 const fallback={
  programs:[['Culte dominical','Dimanche','08h00 – 11h00','Célébration, enseignement et communion.'],['Culte de prière','Mercredi','18h00 – 20h00','Un temps consacré à la prière et à l’intercession.'],['Veillée de prières','Vendredi','21h00 – 00h00','Prière, adoration et recherche de la présence de Dieu.'],['École du dimanche','Dimanche','08h00 – 09h00','Enseignement biblique pour grandir dans la foi.']],
  ministries:[['Louange','Adorer et élever le nom de Jésus','♪'],['Intercession','Prier sans cesse pour la moisson','✦'],['Jeunesse','Former une génération de vainqueurs','◉'],['Enfants','Élever les enfants dans la crainte de l’Éternel','♡'],['Évangélisation','Partager l’Évangile avec puissance','↗'],['Accueil','Accueillir et orienter chaque personne','⌂'],['Communication','Faire connaître la vie du ministère','◌'],['Média','Produire et diffuser les contenus','▶'],['Protocole','Servir avec ordre et excellence','◇']],

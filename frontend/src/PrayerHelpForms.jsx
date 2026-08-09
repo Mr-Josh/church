@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { churchApi } from './services/churchApi';
 
-const WHATSAPP_NUMBER = '237600000000';
+const WHATSAPP_NUMBER = '237690558623';
 function whatsappLink(type, form) {
   const title = type === 'prayer' ? 'DEMANDE DE PRIÈRE' : 'DEMANDE D’AIDE';
   const lines = [`*GOSPEL BREAK CHAIN MINISTRY*`, `*${title}*`, '', `Nom : ${form.name || 'Non renseigné'}`, `Téléphone : ${form.phone || 'Non renseigné'}`];
