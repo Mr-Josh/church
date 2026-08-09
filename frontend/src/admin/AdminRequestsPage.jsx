@@ -4,8 +4,8 @@ import { churchApi } from '../services/churchApi';
 import './admin.css';
 
 const configs = {
-  'prayer-requests': { title: 'Demandes de prière', icon: '◉', tone: 'prayer', description: 'Les sujets envoyés par les visiteurs.', fields: ['subject', 'message'] },
-  'help-requests': { title: "Demandes d’aide", icon: '♡', tone: 'help', description: 'Les personnes qui demandent un accompagnement.', fields: ['message'] },
+  'prayer-requests': { title: 'Demandes de prière', icon: '◉', tone: 'prayer', description: 'Les sujets envoyés par les visiteurs.' },
+  'help-requests': { title: "Demandes d’aide", icon: '♡', tone: 'help', description: 'Les personnes qui demandent un accompagnement.' },
 };
 
 export default function AdminRequestsPage({ resource }) {
@@ -14,61 +14,12 @@ export default function AdminRequestsPage({ resource }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const load = async () => {
-    setLoading(true);
-    try {
-      const response = await churchApi.admin.list(resource);
-      setItems(response.data || []);
-    } catch (e) {
-      setError(e.message);
-      if (e.message.toLowerCase().includes('auth')) navigate('/admin/login');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const load = async () => { setLoading(true); try { const response = await churchApi.admin.list(resource); setItems(response.data || []); } catch (e) { setError(e.message); if (e.message.toLowerCase().includes('auth')) navigate('/admin/login'); } finally { setLoading(false); } };
   useEffect(() => { load(); }, [resource]);
-
-  const updateStatus = async (id, status) => {
-    try {
-      await churchApi.admin.update(resource, id, { status });
-      await load();
-    } catch (e) { setError(e.message); }
-  };
-
+  const updateStatus = async (id, status) => { try { await churchApi.admin.update(resource, id, { status }); await load(); } catch (e) { setError(e.message); } };
   return <div className="admin-shell">
-    <aside className="admin-sidebar">
-      <Link to="/" className="admin-brand"><span className="brand-mark">G+</span><span><strong>GOSPEL BREAK</strong><small>CHAIN MINISTRY</small></span></Link>
-      <span className="sidebar-caption">ADMINISTRATION</span>
-      <nav>
-        <Link className="sidebar-link" to="/admin"><i>⌂</i><span>Dashboard</span></Link>
-        <Link className={`sidebar-link ${resource === 'prayer-requests' ? 'active' : ''}`} to="/admin/prayer-requests"><i>◉</i><span>Demandes de prière</span></Link>
-        <Link className={`sidebar-link ${resource === 'help-requests' ? 'active' : ''}`} to="/admin/help-requests"><i>♡</i><span>Demandes d’aide</span></Link>
-        <Link className="sidebar-link" to="/admin/testimonials"><i>▱</i><span>Témoignages</span></Link>
-        <Link className="sidebar-link" to="/admin/ministries"><i>▤</i><span>Contenu du site</span></Link>
-        <Link className="sidebar-link" to="/admin/settings"><i>⌂</i><span>Église</span></Link>
-      </nav>
-      <button className="admin-logout" onClick={async () => { await churchApi.logout(); navigate('/admin/login'); }}><i>↪</i><span>Déconnexion</span></button>
-    </aside>
-    <main className="admin-main">
-      <header className="admin-header"><div><p className="dashboard-eyebrow">ADMINISTRATION</p><h1>{config.title}</h1><p>{config.description}</p></div><Link to="/admin" className="btn outline">← Dashboard</Link></header>
-      {error && <div className="form-error dashboard-error">{error}</div>}
-      <section className="admin-panel request-page-panel">
-        <div className="admin-list-head"><div><h2>Demandes reçues</h2><p className="admin-muted">{items.length} élément{items.length > 1 ? 's' : ''}</p></div><span>{items.length}</span></div>
-        {loading ? <p className="admin-muted">Chargement...</p> : items.length === 0 ? <div className="empty-state"><strong>Aucune demande pour le moment</strong><span>Les nouvelles demandes envoyées depuis le site apparaîtront ici.</span></div> :
-          <div className="request-list">{items.map(item => <article className="request-card" key={item.id}>
-            <div className={`request-icon ${config.tone}`}>{config.icon}</div>
-            <div className="request-content">
-              <div className="request-meta"><strong>{item.name || 'Anonyme'}</strong><span>{item.phone || 'Téléphone non renseigné'}</span><small>#{item.id}</small></div>
-              {item.subject && <h3>{item.subject}</h3>}
-              <p>{item.message}</p>
-              {item.email && <span className="request-email">{item.email}</span>}
-              <div className="request-flags">{item.is_urgent && <span className="request-urgent">Urgente</span>}{item.is_confidential && <span>Confidentielle</span>}</div>
-            </div>
-            <div className="request-actions"><span className={`status ${item.status || 'pending'}`}>{item.status || 'pending'}</span><select value={item.status || 'pending'} onChange={e => updateStatus(item.id, e.target.value)}><option value="pending">En attente</option><option value="in_progress">En cours</option><option value="resolved">Traitée</option></select></div>
-          </article>)}</div>}
-      </section>
-    </main>
+    <style>{`.request-page-panel{padding:26px}.admin-muted{color:#8b97a5;font-size:11px;margin:4px 0}.request-list{display:grid;gap:10px;margin-top:18px}.request-card{display:grid;grid-template-columns:auto 1fr auto;gap:15px;align-items:start;padding:17px;border:1px solid #edf0f4;border-radius:10px;background:#fff}.request-card:hover{border-color:#d9e0e8}.request-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:18px}.request-icon.prayer{background:#fff0f0;color:#ef4444}.request-icon.help{background:#fff4e2;color:#f59e0b}.request-content{min-width:0}.request-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.request-meta strong{font-size:11px;color:#061b35}.request-meta span,.request-meta small{font-size:9px;color:#8b97a5}.request-content h3{font:700 15px Georgia,serif;color:#10233f;margin:9px 0 6px}.request-content p{font-size:11px;line-height:1.65;color:#66768a;margin:0}.request-email{display:block;font-size:9px;color:#c28b16;margin-top:8px}.request-flags{display:flex;gap:6px;margin-top:9px}.request-flags span{font-size:8px;font-weight:800;color:#718096;background:#f1f4f7;border-radius:999px;padding:5px 8px}.request-flags .request-urgent{background:#fff0f0;color:#d83c3c}.request-actions{display:grid;justify-items:end;gap:9px}.request-actions select{border:1px solid #dce3eb;border-radius:7px;background:#fff;color:#415268;padding:7px 8px;font-size:9px;outline:0}.status.pending{background:#fff2dc;color:#9b6807}.status.in_progress{background:#eaf2ff;color:#2d68ca}.status.resolved{background:#e9f6ed;color:#347b4e}.empty-state{min-height:180px;display:grid;place-items:center;align-content:center;gap:7px;text-align:center;color:#8b97a5}.empty-state strong{color:#10233f;font-size:13px}.empty-state span{font-size:10px}@media(max-width:700px){.request-card{grid-template-columns:auto 1fr}.request-actions{grid-column:2;justify-items:start;display:flex;align-items:center}.request-actions select{max-width:180px}}`}</style>
+    <aside className="admin-sidebar"><Link to="/" className="admin-brand"><span className="brand-mark">G+</span><span><strong>GOSPEL BREAK</strong><small>CHAIN MINISTRY</small></span></Link><span className="sidebar-caption">ADMINISTRATION</span><nav><Link className="sidebar-link" to="/admin"><i>⌂</i><span>Dashboard</span></Link><Link className={`sidebar-link ${resource === 'prayer-requests' ? 'active' : ''}`} to="/admin/prayer-requests"><i>◉</i><span>Demandes de prière</span></Link><Link className={`sidebar-link ${resource === 'help-requests' ? 'active' : ''}`} to="/admin/help-requests"><i>♡</i><span>Demandes d’aide</span></Link><Link className="sidebar-link" to="/admin/testimonials"><i>▱</i><span>Témoignages</span></Link><Link className="sidebar-link" to="/admin/content"><i>▤</i><span>Contenu du site</span></Link><Link className="sidebar-link" to="/admin/settings"><i>⌂</i><span>Église</span></Link></nav><button className="admin-logout" onClick={async () => { await churchApi.logout(); navigate('/admin/login'); }}><i>↪</i><span>Déconnexion</span></button></aside>
+    <main className="admin-main"><header className="admin-header"><div><p className="dashboard-eyebrow">ADMINISTRATION</p><h1>{config.title}</h1><p>{config.description}</p></div><Link to="/admin" className="btn outline">← Dashboard</Link></header>{error&&<div className="form-error dashboard-error">{error}</div>}<section className="admin-panel request-page-panel"><div className="admin-list-head"><div><h2>Demandes reçues</h2><p className="admin-muted">{items.length} élément{items.length>1?'s':''}</p></div><span>{items.length}</span></div>{loading?<p className="admin-muted">Chargement...</p>:items.length===0?<div className="empty-state"><strong>Aucune demande pour le moment</strong><span>Les nouvelles demandes envoyées depuis le site apparaîtront ici.</span></div>:<div className="request-list">{items.map(item=><article className="request-card" key={item.id}><div className={`request-icon ${config.tone}`}>{config.icon}</div><div className="request-content"><div className="request-meta"><strong>{item.name||'Anonyme'}</strong><span>{item.phone||'Téléphone non renseigné'}</span><small>#{item.id}</small></div>{item.subject&&<h3>{item.subject}</h3>}<p>{item.message}</p>{item.email&&<span className="request-email">{item.email}</span>}<div className="request-flags">{item.is_urgent&&<span className="request-urgent">Urgente</span>}{item.is_confidential&&<span>Confidentielle</span>}</div></div><div className="request-actions"><span className={`status ${item.status||'pending'}`}>{item.status||'pending'}</span><select value={item.status||'pending'} onChange={e=>updateStatus(item.id,e.target.value)}><option value="pending">En attente</option><option value="in_progress">En cours</option><option value="resolved">Traitée</option></select></div></article>)}</div>}</section></main>
   </div>;
 }
