@@ -7,6 +7,7 @@ $db = require __DIR__ . '/../config/database.php';
 require __DIR__ . '/../src/response.php';
 require __DIR__ . '/../src/auth.php';
 require __DIR__ . '/../src/router.php';
+require __DIR__ . '/../src/admin.php';
 
 header('Access-Control-Allow-Origin: ' . $config['cors_origin']);
 header('Access-Control-Allow-Credentials: true');
@@ -14,13 +15,10 @@ header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
-
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-if ($path === '/api/health' && $method === 'GET') {
-    jsonResponse(['status' => 'ok', 'service' => 'church-api']);
-}
+if ($path === '/api/health' && $method === 'GET') jsonResponse(['status' => 'ok', 'service' => 'church-api']);
 
 if ($path === '/api/auth/login' && $method === 'POST') {
     $data = requestBody();
@@ -29,18 +27,15 @@ if ($path === '/api/auth/login' && $method === 'POST') {
     $stmt->execute([$data['email']]);
     $user = $stmt->fetch();
     if (!$user || !password_verify($data['password'], $user['password'])) jsonResponse(['message' => 'Invalid credentials.'], 401);
-    startSession();
-    $_SESSION['user_id'] = (int) $user['id'];
-    unset($user['password']);
+    startSession(); $_SESSION['user_id'] = (int) $user['id']; unset($user['password']);
     jsonResponse(['user' => $user]);
 }
 
 if ($path === '/api/auth/logout' && $method === 'POST') {
-    startSession();
-    $_SESSION = [];
-    session_destroy();
-    jsonResponse(['message' => 'Logged out.']);
+    startSession(); $_SESSION = []; session_destroy(); jsonResponse(['message' => 'Logged out.']);
 }
+
+if ($path === '/api/admin/dashboard' && $method === 'GET') adminDashboard($db);
 
 publicRoute($db, $path, $method);
 
