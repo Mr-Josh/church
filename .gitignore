@@ -1,0 +1,22 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# PHP
+backend/vendor/
+backend/storage/logs/*
+backend/storage/cache/*
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Editors
+.vscode/
+.idea/
+.DS_Store
+*.log
