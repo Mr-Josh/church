@@ -1,33 +1,35 @@
-/* Hero branding: keep the original in-content logo and use the same logo as a visible background. */
+/* Hero branding: preserve the existing public design and use the ministry emblem as the hero background. */
 .brand img{width:92px!important;height:58px!important;object-fit:contain;object-position:center;display:block}
 .hero-brand{display:block!important}
 
-/* Shared hero treatment: same tone on every public hero. */
+/* One shared hero treatment for the home page and every inner page. */
 .hero-home,
 .page-hero{
-  background:linear-gradient(110deg,rgba(3,18,36,.94),rgba(8,29,56,.70))!important;
-  color:#fff;
   position:relative;
   overflow:hidden;
+  color:#fff;
+  background-color:#132b45!important;
+  background-image:
+    linear-gradient(110deg,rgba(3,18,36,.90),rgba(8,29,56,.58)),
+    url('/hero-logo.webp')!important;
+  background-repeat:no-repeat,no-repeat!important;
+  background-position:center,82% 50%!important;
+  background-size:cover,460px auto!important;
 }
 
-/* Visible logo background: intentionally subtle, but clearly readable. */
+/* The image is now part of the hero background itself; do not hide it behind another overlay. */
 .hero-home::after,
 .page-hero::after{
-  content:"";
-  position:absolute;
-  inset:-20px;
-  background:url('/hero-logo.webp') 78% 50% / 560px auto no-repeat;
-  filter:blur(1px);
-  opacity:.42;
-  transform:scale(1.02);
-  pointer-events:none;
-  z-index:1;
+  content:none!important;
 }
 
-.hero-content{padding:70px 20px!important;position:relative;z-index:2}
+.hero-content{
+  position:relative;
+  z-index:2;
+  padding:70px 20px!important;
+}
 
-/* Keep every public hero at the same height so the shared background is framed consistently. */
+/* Keep all public heroes framed consistently. */
 .hero-home,
 .page-hero{
   min-height:650px!important;
@@ -36,17 +38,12 @@
 
 @media(max-width:780px){
   .brand img{width:78px!important;height:52px!important}
-  .hero-home::after,.page-hero::after{
-    background-position:72% 46%;
-    background-size:360px auto;
-    filter:blur(1px);
-    opacity:.36;
-  }
-  .hero-content{padding:60px 20px!important}
-
   .hero-home,
   .page-hero{
     min-height:430px!important;
     height:430px;
+    background-position:center,76% 48%!important;
+    background-size:cover,330px auto!important;
   }
+  .hero-content{padding:60px 20px!important}
 }
