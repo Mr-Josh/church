@@ -77,6 +77,11 @@ export function Footer() {
           <span>{church.email}</span>
           <a href={WHATSAPP_URL}>WhatsApp</a>
         </div>
+        <div className="footer-pastor-access">
+          <h4>Espace Pasteur</h4>
+          <p>Accédez à l’administration du ministère.</p>
+          <Link className="footer-admin-link" to="/admin">Accéder au dashboard <span aria-hidden="true">→</span></Link>
+        </div>
       </div>
       <div className="footer-bottom">
         © 2026 Gospel Break Chain Ministry. Tous droits réservés.
