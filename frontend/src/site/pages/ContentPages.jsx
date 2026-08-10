@@ -56,9 +56,6 @@ export function Home() {
     <>
       <section className="hero-home">
         <div className="container hero-content">
-          <div className="hero-brand" aria-hidden="true">
-            <img src="/hero-logo.webp" alt="" width="220" height="220" fetchPriority="high" decoding="async" />
-          </div>
           <p className="eyebrow">GOSPEL BREAK CHAIN MINISTRY</p>
           <h1>BRISONS LES CHAÎNES<br /><span>PAR LE POUVOIR DE CHRIST</span></h1>
           <p className="verse">« Si le Fils vous affranchit, vous serez réellement libres. » <b>Jean 8:36</b></p>
