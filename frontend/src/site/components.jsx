@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { church, WHATSAPP_URL } from './config';
 import { navigation } from './data';
+import './footer.css';
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -51,18 +52,18 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="footer-main">
-        <div>
+        <div className="footer-brand-group">
           <img src="/logo.svg" className="footer-logo" alt="Gospel Break Chain Ministry" />
           <p>Nous existons pour glorifier Dieu, édifier les saints et impacter notre génération par l’Évangile.</p>
         </div>
-        <div>
+        <div className="footer-group">
           <h4>Liens rapides</h4>
           <Link to="/about">À propos</Link>
           <Link to="/ministries">Ministères</Link>
           <Link to="/events">Événements</Link>
           <Link to="/contact">Contact</Link>
         </div>
-        <div>
+        <div className="footer-group">
           <h4>Nos services</h4>
           <Link to="/prayer">Demande de prière</Link>
           <Link to="/donate">Faire un don</Link>
@@ -70,21 +71,17 @@ export function Footer() {
           <Link to="/testimonials">Témoignages</Link>
           <Link to="/help">Assistance</Link>
         </div>
-        <div>
+        <div className="footer-group footer-contact-group">
           <h4>Contactez-nous</h4>
           <span>{church.address}</span>
           <span>{church.phone}</span>
           <span>{church.email}</span>
           <a href={WHATSAPP_URL}>WhatsApp</a>
-        </div>
-        <div className="footer-pastor-access">
-          <h4>Espace Pasteur</h4>
-          <p>Accédez à l’administration du ministère.</p>
-          <Link className="footer-admin-link" to="/admin">Accéder au dashboard <span aria-hidden="true">→</span></Link>
+          <Link className="footer-pastor-link" to="/admin">Espace Pasteur →</Link>
         </div>
       </div>
       <div className="footer-bottom">
-        © 2026 Gospel Break Chain Ministry. Tous droits réservés.
+        <span>© 2026 Gospel Break Chain Ministry. Tous droits réservés.</span>
         <span>Mentions légales · Politique de confidentialité</span>
       </div>
     </footer>
