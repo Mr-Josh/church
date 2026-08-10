@@ -1,0 +1,41 @@
+.footer-main > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.footer-brand-group {
+  padding-right: 15px;
+}
+
+.footer-main p {
+  margin: 18px 0 0;
+}
+
+.footer-contact-group span {
+  max-width: 230px;
+}
+
+.footer-pastor-link {
+  margin-top: 13px !important;
+  color: var(--gold);
+  font-weight: 800;
+}
+
+.footer-bottom {
+  align-items: center;
+}
+
+@media (min-width: 1101px) {
+  .footer-main {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: start;
+  }
+}
+
+@media (min-width: 781px) and (max-width: 1100px) {
+  .footer-main > div:first-child {
+    grid-column: 1 / -1;
+  }
+}
