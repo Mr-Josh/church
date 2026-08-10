@@ -1,20 +1,36 @@
+import { requestFailed, requestFinished, requestStarted, requestSucceeded, setupStateAccessibility } from '../uiStates';
+import '../uiStates.css';
+
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+setupStateAccessibility();
 
 async function request(path, options = {}) {
-  const response = await fetch(`${API_BASE}${path}`, {
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-    ...options,
-  });
+  const method = (options.method || 'GET').toUpperCase();
+  const retry = () => request(path, options);
+  requestStarted(method, path, retry);
 
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(payload.message || 'Une erreur est survenue.');
+  try {
+    const response = await fetch(`${API_BASE}${path}`, {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      },
+      ...options,
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.message || 'Une erreur est survenue.');
+    }
+
+    requestSucceeded(method, path);
+    requestFinished(method, path);
+    return payload;
+  } catch (error) {
+    requestFailed(method, path, error, retry);
+    throw error;
   }
-  return payload;
 }
 
 export const churchApi = {
