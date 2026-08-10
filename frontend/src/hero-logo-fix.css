@@ -25,6 +25,13 @@
 }
 .hero-content{padding:70px 20px!important}
 
+/* Keep every public hero at the same height so the shared background is framed consistently. */
+.hero-home,
+.page-hero{
+  min-height:650px!important;
+  height:650px;
+}
+
 @media(max-width:780px){
   .brand img{width:78px!important;height:52px!important}
   .hero-home::after,.page-hero::after{
@@ -34,4 +41,10 @@
     opacity:.24;
   }
   .hero-content{padding:60px 20px!important}
+
+  .hero-home,
+  .page-hero{
+    min-height:430px!important;
+    height:430px;
+  }
 }
