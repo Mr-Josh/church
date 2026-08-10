@@ -3,7 +3,6 @@ let progress = null;
 let activeRequests = 0;
 let activeMutations = 0;
 let delayedSkeletonTimer = null;
-let lastRequest = null;
 
 function ensureRoot() {
   if (typeof document === 'undefined') return null;
@@ -105,14 +104,39 @@ function showError(error, retry) {
   root.appendChild(box);
   box.querySelector('[data-state-retry]')?.addEventListener('click', () => {
     box.remove();
-    if (retry) retry();
+    retry?.();
   });
   box.querySelector('[data-state-close]')?.addEventListener('click', () => box.remove());
 }
 
+function installEmptyStates() {
+  if (typeof document === 'undefined' || document.body.dataset.emptyStatesInstalled) return;
+  document.body.dataset.emptyStatesInstalled = 'true';
+  const selectors = [
+    ['.event-grid.big', 'Aucun événement', 'Il n’y a actuellement aucun événement à afficher.'],
+    ['.ministry-grid', 'Aucun ministère', 'Les informations des ministères seront bientôt disponibles.'],
+    ['.schedule-list', 'Aucun programme', 'Les horaires et programmes seront bientôt disponibles.'],
+    ['.sermon-grid.full', 'Aucune prédication', 'Aucune prédication n’est actuellement disponible.'],
+    ['.testimonial-list', 'Aucun témoignage', 'Les premiers témoignages apparaîtront ici après validation.'],
+  ];
+  const apply = () => {
+    selectors.forEach(([selector, title, text]) => {
+      document.querySelectorAll(selector).forEach(container => {
+        if (container.children.length || container.querySelector('[data-empty-state]')) return;
+        const empty = document.createElement('div');
+        empty.dataset.emptyState = 'true';
+        empty.className = 'state-empty';
+        empty.innerHTML = `<div class="state-empty__icon">○</div><strong>${title}</strong><p>${text}</p>`;
+        container.appendChild(empty);
+      });
+    });
+  };
+  apply();
+  new MutationObserver(apply).observe(document.body, { childList: true, subtree: true });
+}
+
 export function requestStarted(method, path, retry) {
   const mutation = method !== 'GET' && method !== 'HEAD';
-  lastRequest = { method, path, retry };
   if (mutation) {
     activeMutations += 1;
     showMutation(path.includes('login') ? 'Connexion en cours…' : 'Traitement en cours…');
@@ -124,7 +148,7 @@ export function requestStarted(method, path, retry) {
   }
 }
 
-export function requestFinished(method, path) {
+export function requestFinished(method) {
   const mutation = method !== 'GET' && method !== 'HEAD';
   if (mutation) {
     activeMutations = Math.max(0, activeMutations - 1);
@@ -146,7 +170,7 @@ export function requestSucceeded(method, path) {
 }
 
 export function requestFailed(method, path, error, retry) {
-  requestFinished(method, path);
+  requestFinished(method);
   if (method !== 'GET' && method !== 'HEAD') {
     showError(error, retry);
   } else {
@@ -158,4 +182,11 @@ export function setupStateAccessibility() {
   if (typeof document === 'undefined') return;
   ensureRoot();
   document.documentElement.classList.add('state-ui-ready');
+  installEmptyStates();
+  window.addEventListener('error', event => {
+    if (event.error) toast('Erreur inattendue', 'Une erreur est survenue. Veuillez réessayer.', 'error');
+  });
+  window.addEventListener('unhandledrejection', () => {
+    toast('Erreur inattendue', 'Une opération n’a pas pu être terminée.', 'error');
+  });
 }
