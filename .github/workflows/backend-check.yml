@@ -1,0 +1,21 @@
+name: Backend checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  php-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+      - name: Check PHP syntax
+        run: |
+          find backend -type f -name '*.php' -print0 | xargs -0 -n1 php -l
