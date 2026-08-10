@@ -1,5 +1,50 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import AdminLayout from './AdminLayout';
 import { churchApi } from '../services/churchApi';
 import './admin.css';
-export default function AdminSettings(){const navigate=useNavigate();const[form,setForm]=useState({}),[loading,setLoading]=useState(true),[saved,setSaved]=useState(false),[error,setError]=useState('');useEffect(()=>{churchApi.admin.churchSettings().then(r=>setForm(r.data||{})).catch(e=>{setError(e.message);navigate('/admin/login')}).finally(()=>setLoading(false))},[navigate]);const submit=async e=>{e.preventDefault();setSaved(false);try{await churchApi.admin.updateChurchSettings(form);setSaved(true)}catch(e){setError(e.message)}};if(loading)return <main className="admin-main"><p>Chargement...</p></main>;return <div className="admin-shell"><aside className="admin-sidebar"><Link to="/" className="admin-brand">Gospel Break Chain Ministry</Link><nav><Link to="/admin">Dashboard</Link><Link className="active" to="/admin/settings">Informations de l’église</Link></nav><button className="admin-logout" onClick={async()=>{await churchApi.logout();navigate('/admin/login')}}>Déconnexion</button></aside><main className="admin-main"><header className="admin-header"><div><p className="eyebrow">ADMINISTRATION</p><h1>Informations de l’église</h1></div><Link to="/admin" className="btn outline">← Dashboard</Link></header><section className="admin-panel"><form className="form-grid" onSubmit={submit}>{[['church_name','Nom de l’église'],['slogan','Slogan'],['address','Adresse'],['phone','Téléphone'],['whatsapp','WhatsApp'],['email','Email']].map(([name,label])=><label key={name}>{label}<input value={form[name]||''} onChange={e=>setForm({...form,[name]:e.target.value})}/></label>)}<label>Mission<textarea value={form.mission||''} onChange={e=>setForm({...form,mission:e.target.value})}/></label><label>Vision<textarea value={form.vision||''} onChange={e=>setForm({...form,vision:e.target.value})}/></label><button className="btn">{saved?'Enregistré':'Enregistrer'}</button>{error&&<div className="form-error">{error}</div>}</form></section></main></div>}
+
+const fields = [
+  ['church_name', 'Nom de l’église', 'text'],
+  ['slogan', 'Slogan', 'text'],
+  ['address', 'Adresse', 'text'],
+  ['phone', 'Téléphone', 'tel'],
+  ['whatsapp', 'WhatsApp', 'tel'],
+  ['email', 'Email', 'email'],
+];
+
+export default function AdminSettings() {
+  const [form, setForm] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
+
+  const load = async () => {
+    setLoading(true); setError('');
+    try { const response = await churchApi.admin.churchSettings(); setForm(response.data || {}); }
+    catch (e) { setError(e.message || 'Impossible de charger les informations de l’église.'); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const update = (name, value) => { setSaved(false); setForm(current => ({ ...current, [name]: value })); };
+  const submit = async event => {
+    event.preventDefault(); setSaving(true); setSaved(false); setError('');
+    try { await churchApi.admin.updateChurchSettings(form); setSaved(true); }
+    catch (e) { setError(e.message || 'Impossible d’enregistrer les modifications.'); }
+    finally { setSaving(false); }
+  };
+
+  return <AdminLayout active="settings" title="Informations de l’église" description="Ces informations alimentent les coordonnées et les liens publics du site.">
+    <section className="admin-panel">
+      {loading ? <div className="admin-form-skeleton"><span/><span/><span/><span/></div> : <form className="form-grid" onSubmit={submit}>
+        {fields.map(([name, label, type]) => <label key={name}>{label}<input type={type} value={form[name] || ''} onChange={e => update(name, e.target.value)} autoComplete="off" /></label>)}
+        <label>Mission<textarea value={form.mission || ''} onChange={e => update('mission', e.target.value)} /></label>
+        <label>Vision<textarea value={form.vision || ''} onChange={e => update('vision', e.target.value)} /></label>
+        {error && <div className="form-error" role="alert">{error}<button type="button" onClick={load}>Réessayer</button></div>}
+        <div className="form-actions"><button className="btn" type="submit" disabled={saving}>{saving ? 'Enregistrement…' : saved ? '✓ Enregistré' : 'Enregistrer'}</button></div>
+      </form>}
+    </section>
+  </AdminLayout>;
+}
