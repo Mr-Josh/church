@@ -15,7 +15,7 @@ function adminCrudRoute(PDO $db, string $path, string $method): void
     foreach ($resources as $resource => $table) {
         $base = "/api/admin/{$resource}";
         if ($path === $base && $method === 'GET') {
-            $order = in_array($resource, ['prayer-requests', 'help-requests'], true) ? 'ORDER BY is_urgent DESC, id DESC' : 'ORDER BY id DESC';
+            $order = $resource === 'prayer-requests' ? 'ORDER BY is_urgent DESC, id DESC' : 'ORDER BY id DESC';
             $stmt = $db->query("SELECT * FROM {$table} {$order}");
             jsonResponse(['data' => $stmt->fetchAll()]);
         }
