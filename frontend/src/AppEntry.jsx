@@ -2,7 +2,6 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import './styles.css';
 import './responsive.css';
-import './hero-logo-fix.css';
 import AdminApp from './admin/AdminApp';
 import PublicApp from './site/PublicApp';
 
