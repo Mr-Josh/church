@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { church, WHATSAPP_URL } from './config';
 import { navigation } from './data';
 import './footer.css';
+import './hero.css';
 
 export function Header() {
   const [open, setOpen] = useState(false);
