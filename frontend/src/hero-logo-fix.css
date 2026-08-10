@@ -1,28 +1,31 @@
-/* Hero branding: keep the original in-content logo and use the same logo as a subtle background. */
+/* Hero branding: keep the original in-content logo and use the same logo as a visible background. */
 .brand img{width:92px!important;height:58px!important;object-fit:contain;object-position:center;display:block}
 .hero-brand{display:block!important}
 
-/* Shared hero treatment: both home and inner pages use exactly the same base tone. */
+/* Shared hero treatment: same tone on every public hero. */
 .hero-home,
 .page-hero{
-  background:linear-gradient(110deg,rgba(3,18,36,.96),rgba(8,29,56,.78))!important;
+  background:linear-gradient(110deg,rgba(3,18,36,.94),rgba(8,29,56,.70))!important;
   color:#fff;
+  position:relative;
+  overflow:hidden;
 }
 
+/* Visible logo background: intentionally subtle, but clearly readable. */
 .hero-home::after,
 .page-hero::after{
   content:"";
   position:absolute;
-  inset:-28px;
-  background:url('/hero-logo.webp') 76% 50% / 560px auto no-repeat;
-  filter:blur(2px);
-  opacity:.27;
-  transform:scale(1.04);
+  inset:-20px;
+  background:url('/hero-logo.webp') 78% 50% / 560px auto no-repeat;
+  filter:blur(1px);
+  opacity:.42;
+  transform:scale(1.02);
   pointer-events:none;
-  z-index:0;
+  z-index:1;
 }
 
-.hero-content{padding:70px 20px!important}
+.hero-content{padding:70px 20px!important;position:relative;z-index:2}
 
 /* Keep every public hero at the same height so the shared background is framed consistently. */
 .hero-home,
@@ -36,8 +39,8 @@
   .hero-home::after,.page-hero::after{
     background-position:72% 46%;
     background-size:360px auto;
-    filter:blur(2px);
-    opacity:.24;
+    filter:blur(1px);
+    opacity:.36;
   }
   .hero-content{padding:60px 20px!important}
 
