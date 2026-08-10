@@ -3,6 +3,15 @@ html,body,#root{max-width:100%;overflow-x:hidden}
 img,svg,video{max-width:100%;height:auto}
 button,a,input,textarea{touch-action:manipulation}
 
+/* Footer: keep groups aligned to the same grid without forcing equal content heights. */
+.footer-main{grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(140px,1fr));align-items:start;gap:clamp(24px,4vw,50px)}
+.footer-main>div{min-width:0}
+.footer-main p,.footer-main a,.footer-main span{overflow-wrap:anywhere}
+.footer-pastor-access{padding-left:4px}
+.footer-pastor-access p{margin:0 0 12px;max-width:220px;color:#aebbc9}
+.footer-admin-link{display:inline-flex!important;align-items:center;justify-content:space-between;gap:12px;width:100%;max-width:220px;padding:9px 11px;border:1px solid rgba(201,162,74,.35);border-radius:7px;color:#fff!important;line-height:1.35!important}
+.footer-admin-link:hover{border-color:var(--gold);background:rgba(201,162,74,.08)}
+
 @media (max-width:1100px){
   .container{width:min(100% - 32px,960px)}
   .topbar{padding-left:16px;padding-right:16px;font-size:11px}
@@ -10,7 +19,7 @@ button,a,input,textarea{touch-action:manipulation}
   .pillar-grid{grid-template-columns:repeat(2,1fr)}.pillar:nth-child(2){border-right:0}.pillar:nth-child(-n+2){border-bottom:1px solid var(--line)}
   .event-grid{grid-template-columns:repeat(2,1fr)}.ministry-grid{grid-template-columns:repeat(2,1fr)}.media-grid{grid-template-columns:1fr}
   .pastor-highlight{grid-template-columns:300px 1fr;gap:40px}.pastor-layout{grid-template-columns:320px 1fr;gap:35px}.values{grid-template-columns:repeat(3,1fr)}
-  .footer-main{grid-template-columns:repeat(2,1fr);gap:35px}.footer-main>div:first-child{grid-column:1/-1}
+  .footer-main{grid-template-columns:repeat(3,minmax(0,1fr));gap:35px}.footer-main>div:first-child{grid-column:1/-1}
   .dashboard-top-grid{grid-template-columns:1fr 1fr}.dashboard-top-grid .payment-placeholder{grid-column:1/-1}.stats-grid{grid-template-columns:repeat(2,1fr)}.dashboard-bottom-grid{grid-template-columns:1fr}
 }
 
@@ -33,7 +42,7 @@ button,a,input,textarea{touch-action:manipulation}
   .two-cols,.pastor-layout,.timeline-cols,.contact-layout,.testimonials,.evangelism,.help-layout{grid-template-columns:1fr;gap:28px}.schedule-card{padding:18px}.schedule-row{display:grid;grid-template-columns:1fr;gap:5px;padding:14px 0}
   .event-grid,.event-grid.big,.ministry-grid,.sermon-grid,.three-cards{grid-template-columns:1fr}.event-card{padding:19px;gap:14px}.event-card h3{font-size:18px}.pastor-highlight{grid-template-columns:1fr;gap:28px}.pastor-placeholder,.pastor-photo{min-height:340px}.dark-section blockquote{font-size:25px;line-height:1.4}
   .media-grid{gap:35px}.sermon-grid{gap:20px}.media-thumb{height:190px}.quote-card{padding:22px}.quote-card p{font-size:16px}.donation-banner{padding:42px 14px;display:block;text-align:center}.donation-banner h2{font-size:25px;line-height:1.3}.donation-banner .btn{margin-top:15px}
-  .footer-main{width:calc(100% - 28px);padding:48px 0 30px;grid-template-columns:1fr;gap:30px}.footer-main>div:first-child{grid-column:auto}.footer-bottom{padding:17px 14px;display:block;line-height:1.7;text-align:center}.footer-bottom span{display:block;margin-top:5px}
+  .footer-main{width:calc(100% - 28px);padding:48px 0 30px;grid-template-columns:1fr;gap:30px}.footer-main>div:first-child{grid-column:auto}.footer-pastor-access{padding-left:0}.footer-admin-link{max-width:none}.footer-bottom{padding:17px 14px;display:block;line-height:1.7;text-align:center}.footer-bottom span{display:block;margin-top:5px}
   .page-hero{min-height:260px;padding:48px 14px}.page-hero h1{font-size:clamp(34px,10vw,52px);max-width:100%;line-height:1.05}.page-hero p{font-size:13px;line-height:1.65}.hero-ornament{display:none}
   .three-cards article,.message-card,.form-card{padding:23px}.three-cards h2{font-size:19px}.values{grid-template-columns:repeat(2,1fr)}.pastor-layout{gap:22px}.message-card h2{font-size:28px;line-height:1.2}.timeline-cols{gap:40px}
   .schedule-list article{grid-template-columns:46px 1fr;gap:15px;padding:18px}.schedule-list article>strong{grid-column:2;font-size:13px}.event-feature{min-width:0}.event-image{height:135px}.event-body{padding:20px}.event-body h2{font-size:22px}
