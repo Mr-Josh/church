@@ -1,0 +1,10 @@
+/* Hero branding display only: keep source assets untouched and prevent the logo from overflowing the header/hero. */
+.brand img{width:92px!important;height:58px!important;object-fit:contain;object-position:center;display:block}
+.hero-brand{width:110px!important;max-width:110px!important;margin:0 0 14px}
+.hero-brand img{width:110px!important;height:120px!important;object-fit:contain;object-position:center}
+
+@media (max-width:780px){
+  .brand img{width:78px!important;height:52px!important}
+  .hero-brand{width:92px!important;max-width:92px!important}
+  .hero-brand img{width:92px!important;height:100px!important}
+}
