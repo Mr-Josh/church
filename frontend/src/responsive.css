@@ -70,4 +70,4 @@ button,a,input,textarea{touch-action:manipulation}
   .stats-grid{grid-template-columns:1fr}.stat-card{min-height:95px}.dashboard-header{display:grid;grid-template-columns:1fr auto}.dashboard-header .header-title{min-width:0}.dashboard-header .header-title>div{min-width:0}.dashboard-header p{font-size:11px}.activity-row{gap:8px}.activity-time{display:none}.panel-head{margin-bottom:13px}.panel-head h2{font-size:16px}.quick-actions a{min-height:52px}
 }
 
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
