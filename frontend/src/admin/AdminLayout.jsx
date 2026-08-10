@@ -5,7 +5,7 @@ import './admin.css';
 import './admin-refactor.css';
 
 const navigation = [
-  ['⌂', 'Dashboard', '/admin'],
+  ['⌂', 'Dashboard', '/admin', 'dashboard'],
   ['◉', 'Demandes de prière', '/admin/prayer-requests', 'prayer-requests'],
   ['♡', "Demandes d’aide", '/admin/help-requests', 'help-requests'],
   ['▱', 'Témoignages', '/admin/testimonials', 'testimonials'],
@@ -29,8 +29,8 @@ export default function AdminLayout({ children, counts = {}, title, description,
       <span className="sidebar-caption">ADMINISTRATION</span>
       <nav aria-label="Administration">
         {navigation.map(([icon, label, to, key]) => {
-          const isActive = active ? active === key : (to === '/admin' ? location.pathname === '/admin' : location.pathname.startsWith(to));
-          const badge = key && counts[key];
+          const isActive = active ? active === key : (key === 'dashboard' ? location.pathname === '/admin' : location.pathname.startsWith(to));
+          const badge = counts[key];
           return <Link className={`sidebar-link ${isActive ? 'active' : ''}`} key={to} to={to}><i aria-hidden="true">{icon}</i><span>{label}</span>{badge > 0 && <b>{badge}</b>}</Link>;
         })}
         <div className="sidebar-link disabled" aria-disabled="true" title="Le module de paiement sera connecté séparément"><i aria-hidden="true">▣</i><span>Dons & Offrandes</span><em>À venir</em></div>
