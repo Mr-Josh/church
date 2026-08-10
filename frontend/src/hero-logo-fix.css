@@ -1,17 +1,15 @@
 /* Hero branding: keep the original in-content logo and use the same logo as a subtle background. */
 .brand img{width:92px!important;height:58px!important;object-fit:contain;object-position:center;display:block}
 .hero-brand{display:block!important}
-.hero-home::after{
-  content:"";
-  position:absolute;
-  inset:-28px;
-  background:url('/hero-logo.webp') 76% 50% / 560px auto no-repeat;
-  filter:blur(2px);
-  opacity:.27;
-  transform:scale(1.04);
-  pointer-events:none;
-  z-index:0;
+
+/* Shared hero treatment: both home and inner pages use exactly the same base tone. */
+.hero-home,
+.page-hero{
+  background:linear-gradient(110deg,rgba(3,18,36,.96),rgba(8,29,56,.78))!important;
+  color:#fff;
 }
+
+.hero-home::after,
 .page-hero::after{
   content:"";
   position:absolute;
@@ -23,6 +21,7 @@
   pointer-events:none;
   z-index:0;
 }
+
 .hero-content{padding:70px 20px!important}
 
 /* Keep every public hero at the same height so the shared background is framed consistently. */
