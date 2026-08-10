@@ -1,10 +1,26 @@
 /* Hero branding display only: keep source assets untouched and prevent the logo from overflowing the header/hero. */
 .brand img{width:92px!important;height:58px!important;object-fit:contain;object-position:center;display:block}
-.hero-brand{width:110px!important;max-width:110px!important;margin:0 0 14px}
-.hero-brand img{width:110px!important;height:120px!important;object-fit:contain;object-position:center}
+
+/* Keep the existing hero composition, but replace the decorative cross with the ministry logo as a subtle background watermark. */
+.hero-brand{display:none!important}
+.hero-home::after{
+  content:"";
+  position:absolute;
+  inset:-28px;
+  background:url('/hero-logo.webp') 76% 50% / 560px auto no-repeat;
+  filter:blur(8px);
+  opacity:.22;
+  transform:scale(1.04);
+  pointer-events:none;
+  z-index:0;
+}
 
 @media (max-width:780px){
   .brand img{width:78px!important;height:52px!important}
-  .hero-brand{width:92px!important;max-width:92px!important}
-  .hero-brand img{width:92px!important;height:100px!important}
+  .hero-home::after{
+    background-position:72% 46%;
+    background-size:360px auto;
+    filter:blur(7px);
+    opacity:.20;
+  }
 }
