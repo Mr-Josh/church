@@ -63,6 +63,12 @@ button,a,input,textarea{touch-action:manipulation}
   .dashboard-top-grid{grid-template-columns:1fr;gap:12px}.dashboard-top-grid .payment-placeholder{grid-column:auto}.dashboard-panel,.payment-placeholder{padding:18px}.donut-wrap{flex-direction:column;gap:18px}.dashboard-bottom-grid{gap:12px}.quick-actions{grid-template-columns:1fr}
   .admin-header{align-items:flex-start;flex-direction:column;gap:10px;margin-bottom:20px}.admin-header h1{font-size:30px}.admin-grid{grid-template-columns:1fr 1fr}.admin-card{padding:16px}.admin-card span{font-size:27px}
   .admin-panel{overflow:hidden}.admin-table{overflow-x:auto;-webkit-overflow-scrolling:touch}.admin-table article{min-width:620px}
+
+  /* Home hero: keep both CTA buttons inside the hero's stacking area. */
+  .hero-home{min-height:680px;overflow:hidden}
+  .hero-content{padding-bottom:120px}
+  .hero-actions{position:relative;z-index:6}
+  .pillars{margin-top:0;z-index:5}
 }
 
 @media (max-width:480px){
