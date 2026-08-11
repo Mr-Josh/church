@@ -136,7 +136,21 @@ export function buildServer() {
   registerDevReadTool(server, 'church_security', 'Read developer-visible security posture, role counts and audit availability.', '/api/dev/security');
   registerDevReadTool(server, 'church_audit', 'Read technical account audit entries with personal identifiers minimized for external audit agents.', '/api/dev/audit', minimizeAudit);
   registerDevReadTool(server, 'church_system', 'Read application, PHP, server and database version information.', '/api/dev/system');
-  registerDevReadTool(server, 'church_session', 'Read the current MCP developer session status and role without exposing personal identifiers.', '/api/dev/session', minimizeSession);
+
+  server.registerTool('church_session', {
+    description: 'Read the current MCP developer session status and role without exposing personal identifiers.',
+    annotations: READ_ONLY
+  }, async () => {
+    await ensureDeveloperSession();
+    return textResult({
+      data: {
+        authenticated: true,
+        role: 'developer',
+        session_status: 'active'
+      }
+    });
+  });
+
   registerDevReadTool(server, 'church_diagnostics', 'Run the server-side read-only application diagnostics.', '/api/dev/diagnostics');
 
   server.registerResource('architecture', 'church://architecture', {
