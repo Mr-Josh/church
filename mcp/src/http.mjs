@@ -122,9 +122,15 @@ const httpServer = createServer((req, res) => {
     return;
   }
 
+  // For agent-to-agent use only; browser clients are not allowed to establish a session.
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   void nodeHandler(req, res);
+});
+
+httpServer.on('error', (error) => {
+  console.error('[mcp] HTTP server error:', error.message);
+  process.exitCode = 1;
 });
 
 httpServer.listen(PORT, HOST, () => {
