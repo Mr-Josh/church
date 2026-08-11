@@ -65,6 +65,10 @@ export const churchApi = {
 
   logout: () => request('/auth/logout', { method: 'POST' }),
 
+  dev: {
+    summary: () => request('/dev/summary'),
+  },
+
   admin: {
     dashboard: () => request('/admin/dashboard'),
     churchSettings: () => request('/admin/church-settings'),
