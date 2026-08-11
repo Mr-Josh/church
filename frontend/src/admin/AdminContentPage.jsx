@@ -5,6 +5,8 @@ const sections = [
   ['Ministères', 'Organisez les ministères et leurs descriptions.', '/admin/ministries', '⌂'],
   ['Programmes', 'Gérez les horaires et rendez-vous réguliers.', '/admin/programs', '◷'],
   ['Événements', 'Publiez les prochains temps forts de l’église.', '/admin/events', '▣'],
+  ['Prédications', 'Gérez les vidéos, audios et PDF de prédications.', '/admin/sermons', '▶'],
+  ['Galerie', 'Gérez les images et vidéos affichées sur le site.', '/admin/gallery', '▧'],
   ['Témoignages', 'Consultez et modérez les témoignages reçus.', '/admin/testimonials', '▱'],
 ];
 
