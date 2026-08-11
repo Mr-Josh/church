@@ -24,14 +24,11 @@ export const churchApi = {
   login: (data) => request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
   logout: () => request('/auth/logout', { method: 'POST' }),
   dev: {
-    summary: () => request('/dev/summary'),
-    database: () => request('/dev/database'),
-    security: () => request('/dev/security'),
-    audit: () => request('/dev/audit'),
+    summary: () => request('/dev/summary'), database: () => request('/dev/database'), security: () => request('/dev/security'), audit: () => request('/dev/audit'),
+    system: () => request('/dev/system'), session: () => request('/dev/session'), diagnostics: () => request('/dev/diagnostics'),
   },
   admin: {
-    dashboard: () => request('/admin/dashboard'),
-    churchSettings: () => request('/admin/church-settings'),
+    dashboard: () => request('/admin/dashboard'), churchSettings: () => request('/admin/church-settings'),
     updateChurchSettings: (data) => request('/admin/church-settings', { method: 'PATCH', body: JSON.stringify(data) }),
     list: (resource) => request(`/admin/${resource}`), get: (resource, id) => request(`/admin/${resource}/${id}`),
     create: (resource, data) => request(`/admin/${resource}`, { method: 'POST', body: JSON.stringify(data) }),
