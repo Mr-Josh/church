@@ -64,30 +64,9 @@ function devSecurity(PDO $db): void
 function devAudit(PDO $db): void
 {
     requireDeveloperAccess($db);
-    if (!devTableExists($db, 'user_admin_audit')) {
-        jsonResponse(['data' => ['entries' => []]]);
-    }
-
-    $stmt = $db->query(
-        'SELECT a.action, actor.role AS actor_role, target.role AS target_role, a.created_at
-         FROM user_admin_audit a
-         LEFT JOIN users actor ON actor.id = a.actor_user_id
-         LEFT JOIN users target ON target.id = a.target_user_id
-         ORDER BY a.created_at DESC, a.id DESC
-         LIMIT 100'
-    );
-
-    $entries = [];
-    foreach ($stmt->fetchAll() as $row) {
-        $entries[] = [
-            'action' => $row['action'] ?? null,
-            'actor_role' => $row['actor_role'] ?? null,
-            'target_role' => $row['target_role'] ?? null,
-            'created_at' => $row['created_at'] ?? null,
-        ];
-    }
-
-    jsonResponse(['data' => ['entries' => $entries]]);
+    if (!devTableExists($db, 'user_admin_audit')) { jsonResponse(['data' => ['entries' => []]]); }
+    $stmt = $db->query('SELECT a.id, a.actor_user_id, a.target_user_id, a.action, a.created_at, actor.email AS actor_email, target.email AS target_email FROM user_admin_audit a LEFT JOIN users actor ON actor.id = a.actor_user_id LEFT JOIN users target ON target.id = a.target_user_id ORDER BY a.created_at DESC, a.id DESC LIMIT 100');
+    jsonResponse(['data' => ['entries' => $stmt->fetchAll()]]);
 }
 
 function devSystem(PDO $db): void
@@ -106,14 +85,11 @@ function devSession(PDO $db): void
     requireDeveloperAccess($db);
     startSession();
     $userId = (int) ($_SESSION['user_id'] ?? 0);
-    $stmt = $db->prepare('SELECT role, is_active FROM users WHERE id = ? LIMIT 1');
+    $stmt = $db->prepare('SELECT id, name, email, role, is_active FROM users WHERE id = ? LIMIT 1');
     $stmt->execute([$userId]);
     $user = $stmt->fetch() ?: null;
-    jsonResponse(['data' => [
-        'authenticated' => $user !== null && (bool) $user['is_active'],
-        'role' => $user['role'] ?? null,
-        'session_status' => session_status() === PHP_SESSION_ACTIVE ? 'active' : 'inactive',
-    ]]);
+    if ($user) unset($user['is_active']);
+    jsonResponse(['data' => ['user' => $user, 'session_name' => session_name(), 'session_status' => session_status() === PHP_SESSION_ACTIVE ? 'active' : 'inactive']]);
 }
 
 function devDiagnostics(PDO $db): void
