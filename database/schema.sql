@@ -6,9 +6,11 @@ CREATE TABLE users (
     name VARCHAR(120) NOT NULL,
     email VARCHAR(190) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('pastor') NOT NULL DEFAULT 'pastor',
+    role ENUM('admin','developer') NOT NULL DEFAULT 'admin',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_users_role_active (role, is_active)
 );
 
 CREATE TABLE church_settings (
@@ -23,6 +25,36 @@ CREATE TABLE church_settings (
     email VARCHAR(190) NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- Identifies the principal church administrator without exposing church profile data
+-- to developer endpoints.
+CREATE TABLE church_account_settings (
+    id TINYINT UNSIGNED PRIMARY KEY,
+    primary_admin_user_id INT UNSIGNED NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_primary_admin_user FOREIGN KEY (primary_admin_user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE user_admin_audit (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    actor_user_id INT UNSIGNED NOT NULL,
+    target_user_id INT UNSIGNED NULL,
+    action VARCHAR(32) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_audit_actor FOREIGN KEY (actor_user_id) REFERENCES users(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_audit_target FOREIGN KEY (target_user_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_user_admin_audit_actor (actor_user_id),
+    INDEX idx_user_admin_audit_target (target_user_id)
+);
+
+-- Developer-facing aggregate only. It deliberately contains no church profile,
+-- contact, pastoral, donation or settings fields.
+CREATE OR REPLACE VIEW developer_site_summary AS
+SELECT
+    (SELECT COUNT(*) FROM users WHERE is_active = TRUE) AS active_users,
+    (SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active = TRUE) AS active_admins,
+    (SELECT COUNT(*) FROM users WHERE role = 'developer' AND is_active = TRUE) AS active_developers,
+    (SELECT primary_admin_user_id FROM church_account_settings WHERE id = 1) AS primary_admin_user_id;
 
 CREATE TABLE pages (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
