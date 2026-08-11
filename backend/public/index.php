@@ -20,23 +20,84 @@ header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS');
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-if ($path === '/api/health' && $method === 'GET') jsonResponse(['status' => 'ok', 'service' => 'church-api']);
+if ($path === '/api/health' && $method === 'GET') {
+    jsonResponse(['status' => 'ok', 'service' => 'church-api']);
+}
+
 if ($path === '/api/auth/login' && $method === 'POST') {
     $data = requestBody();
-    if (empty($data['email']) || empty($data['password'])) jsonResponse(['message' => 'Email and password are required.'], 422);
-    $stmt = $db->prepare('SELECT id, name, email, password, role FROM users WHERE email = ? LIMIT 1');
-    $stmt->execute([$data['email']]); $user = $stmt->fetch();
-    if (!$user || !password_verify($data['password'], $user['password'])) jsonResponse(['message' => 'Invalid credentials.'], 401);
-    startSession(); $_SESSION['user_id'] = (int) $user['id']; unset($user['password']);
-    jsonResponse(['user' => $user]);
+    if (empty($data['email']) || empty($data['password'])) {
+        jsonResponse(['message' => 'Email and password are required.'], 422);
+    }
+
+    $stmt = $db->prepare('SELECT id, name, email, password, role, is_active FROM users WHERE email = ? LIMIT 1');
+    $stmt->execute([$data['email']]);
+    $user = $stmt->fetch();
+
+    if (!$user || !(bool) $user['is_active'] || !password_verify($data['password'], $user['password'])) {
+        jsonResponse(['message' => 'Invalid credentials.'], 401);
+    }
+
+    if (!in_array($user['role'], ['admin', 'developer'], true)) {
+        jsonResponse(['message' => 'This account is not authorized for administration.'], 403);
+    }
+
+    startSession();
+    session_regenerate_id(true);
+    $_SESSION['user_id'] = (int) $user['id'];
+    unset($user['password'], $user['is_active']);
+
+    jsonResponse([
+        'user' => $user,
+        'redirect' => $user['role'] === 'developer' ? '/dev' : '/admin',
+    ]);
 }
-if ($path === '/api/auth/logout' && $method === 'POST') { startSession(); $_SESSION = []; session_destroy(); jsonResponse(['message' => 'Logged out.']); }
-if ($path === '/api/admin/dashboard' && $method === 'GET') adminDashboard($db);
-if (strpos($path, '/api/admin/') === 0) adminCrudRoute($db, $path, $method);
+
+if ($path === '/api/auth/logout' && $method === 'POST') {
+    startSession();
+    $_SESSION = [];
+    session_destroy();
+    jsonResponse(['message' => 'Logged out.']);
+}
+
+if ($path === '/api/dev/summary' && $method === 'GET') {
+    requireDeveloper($db);
+
+    $stmt = $db->query("SELECT
+        (SELECT COUNT(*) FROM users WHERE is_active = 1) AS active_users,
+        (SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active = 1) AS active_admins,
+        (SELECT COUNT(*) FROM users WHERE role = 'developer' AND is_active = 1) AS active_developers,
+        EXISTS(SELECT 1 FROM church_account_settings WHERE id = 1 AND primary_admin_user_id IS NOT NULL) AS primary_account_configured
+    ");
+
+    $summary = $stmt->fetch() ?: [];
+    jsonResponse([
+        'data' => [
+            'active_users' => (int) ($summary['active_users'] ?? 0),
+            'active_admins' => (int) ($summary['active_admins'] ?? 0),
+            'active_developers' => (int) ($summary['active_developers'] ?? 0),
+            'primary_account_configured' => (bool) ($summary['primary_account_configured'] ?? false),
+        ],
+    ]);
+}
+
+if ($path === '/api/admin/dashboard' && $method === 'GET') {
+    requireAdmin($db);
+    adminDashboard($db);
+}
+
+if (strpos($path, '/api/admin/') === 0) {
+    adminCrudRoute($db, $path, $method);
+}
+
 publicRoute($db, $path, $method);
 
 if ($path === '/api/prayer-requests' && $method === 'POST') {
@@ -60,4 +121,5 @@ if ($path === '/api/testimonials' && $method === 'POST') {
     $stmt->execute([$data['name'], $data['content'], $data['photo'] ?? null]);
     jsonResponse(['message' => 'Testimonial submitted for review.'], 201);
 }
+
 jsonResponse(['message' => 'Route not found.'], 404);
