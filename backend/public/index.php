@@ -9,21 +9,16 @@ require __DIR__ . '/../src/auth.php';
 require __DIR__ . '/../src/router.php';
 require __DIR__ . '/../src/admin.php';
 require __DIR__ . '/../src/admin_crud.php';
+require __DIR__ . '/../src/dev.php';
 
 $corsOrigin = $config['cors_origin'] ?? null;
-if (!$corsOrigin) {
-    $corsOrigin = 'http://localhost:5173';
-}
-
+if (!$corsOrigin) $corsOrigin = 'http://localhost:5173';
 header('Access-Control-Allow-Origin: ' . $corsOrigin);
 header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS');
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(204);
-    exit;
-}
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -34,69 +29,40 @@ if ($path === '/api/health' && $method === 'GET') {
 
 if ($path === '/api/auth/login' && $method === 'POST') {
     $data = requestBody();
-    if (empty($data['email']) || empty($data['password'])) {
-        jsonResponse(['message' => 'Email and password are required.'], 422);
-    }
-
+    if (empty($data['email']) || empty($data['password'])) jsonResponse(['message' => 'Email and password are required.'], 422);
     $stmt = $db->prepare('SELECT id, name, email, password, role, is_active FROM users WHERE email = ? LIMIT 1');
     $stmt->execute([$data['email']]);
     $user = $stmt->fetch();
-
-    if (!$user || !(bool) $user['is_active'] || !password_verify($data['password'], $user['password'])) {
-        jsonResponse(['message' => 'Invalid credentials.'], 401);
-    }
-
-    if (!in_array($user['role'], ['admin', 'developer'], true)) {
-        jsonResponse(['message' => 'This account is not authorized for administration.'], 403);
-    }
-
+    if (!$user || !(bool) $user['is_active'] || !password_verify($data['password'], $user['password'])) jsonResponse(['message' => 'Invalid credentials.'], 401);
+    if (!in_array($user['role'], ['admin', 'developer'], true)) jsonResponse(['message' => 'This account is not authorized for administration.'], 403);
     startSession();
     session_regenerate_id(true);
     $_SESSION['user_id'] = (int) $user['id'];
     unset($user['password'], $user['is_active']);
-
-    jsonResponse([
-        'user' => $user,
-        'redirect' => $user['role'] === 'developer' ? '/dev' : '/admin',
-    ]);
+    jsonResponse(['user' => $user, 'redirect' => $user['role'] === 'developer' ? '/dev' : '/admin']);
 }
 
 if ($path === '/api/auth/logout' && $method === 'POST') {
-    startSession();
-    $_SESSION = [];
-    session_destroy();
-    jsonResponse(['message' => 'Logged out.']);
+    startSession(); $_SESSION = []; session_destroy(); jsonResponse(['message' => 'Logged out.']);
 }
 
 if ($path === '/api/dev/summary' && $method === 'GET') {
-    requireDeveloper($db);
-
-    $stmt = $db->query("SELECT
-        (SELECT COUNT(*) FROM users WHERE is_active = 1) AS active_users,
-        (SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active = 1) AS active_admins,
-        (SELECT COUNT(*) FROM users WHERE role = 'developer' AND is_active = 1) AS active_developers,
-        EXISTS(SELECT 1 FROM church_account_settings WHERE id = 1 AND primary_admin_user_id IS NOT NULL) AS primary_account_configured
-    ");
-
-    $summary = $stmt->fetch() ?: [];
-    jsonResponse([
-        'data' => [
-            'active_users' => (int) ($summary['active_users'] ?? 0),
-            'active_admins' => (int) ($summary['active_admins'] ?? 0),
-            'active_developers' => (int) ($summary['active_developers'] ?? 0),
-            'primary_account_configured' => (bool) ($summary['primary_account_configured'] ?? false),
-        ],
-    ]);
+    devOverview($db);
+}
+if ($path === '/api/dev/database' && $method === 'GET') {
+    devDatabase($db);
+}
+if ($path === '/api/dev/security' && $method === 'GET') {
+    devSecurity($db);
+}
+if ($path === '/api/dev/audit' && $method === 'GET') {
+    devAudit($db);
 }
 
 if ($path === '/api/admin/dashboard' && $method === 'GET') {
-    requireAdmin($db);
-    adminDashboard($db);
+    requireAdmin($db); adminDashboard($db);
 }
-
-if (strpos($path, '/api/admin/') === 0) {
-    adminCrudRoute($db, $path, $method);
-}
+if (strpos($path, '/api/admin/') === 0) adminCrudRoute($db, $path, $method);
 
 publicRoute($db, $path, $method);
 
