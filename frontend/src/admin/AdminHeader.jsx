@@ -15,26 +15,32 @@ export const pageMeta = {
 
 export default function AdminHeader({ onMenu }) {
   const { pathname } = useLocation();
-
-  // The global header bar belongs exclusively to the dashboard.
-  if (pathname !== '/admin') return null;
-
-  const [eyebrow, title, description] = pageMeta['/admin'];
+  const [eyebrow, title, description] = pageMeta[pathname] || pageMeta['/admin'];
+  const isDashboard = pathname === '/admin';
 
   return (
-    <header className="dashboard-header admin-static-header">
+    <header className={`dashboard-header admin-static-header ${isDashboard ? 'is-dashboard-header' : 'is-inner-header'}`}>
       <div className="header-title">
         <button className="mobile-menu" aria-label="Ouvrir le menu" onClick={onMenu}>☰</button>
-        <div>
-          <p className="dashboard-eyebrow">{eyebrow}</p>
-          <h1>{title}<span> 👋</span></h1>
-          <p>{description}</p>
+        <div className="admin-header-copy">
+          {isDashboard ? (
+            <>
+              <h1 className="admin-header-primary">{eyebrow}</h1>
+              <p className="admin-header-secondary">{title}</p>
+            </>
+          ) : (
+            <>
+              <p className="admin-header-eyebrow">{eyebrow}</p>
+              <h1 className="admin-header-primary">{title}</h1>
+            </>
+          )}
+          <p className="admin-header-description">{description}</p>
         </div>
       </div>
       <div className="header-tools">
         <label className="dashboard-search"><input placeholder="Rechercher..." aria-label="Rechercher" /><span>⌕</span></label>
         <button className="notification" aria-label="Notifications">♧</button>
-        <Link to="/admin/settings" className="pastor-profile" aria-label="Ouvrir les informations du pasteur">
+        <Link to="/admin/settings" className="pastor-profile" aria-label="Ouvrir les informations de l’église">
           <span className="pastor-avatar">JE</span>
           <div><strong>Pasteur</strong><span>Jean Emmanuel</span></div>
           <b>⌄</b>
