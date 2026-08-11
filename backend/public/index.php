@@ -23,45 +23,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-if ($path === '/api/health' && $method === 'GET') {
-    jsonResponse(['status' => 'ok', 'service' => 'church-api']);
-}
+if ($path === '/api/health' && $method === 'GET') jsonResponse(['status' => 'ok', 'service' => 'church-api']);
 
 if ($path === '/api/auth/login' && $method === 'POST') {
     $data = requestBody();
     if (empty($data['email']) || empty($data['password'])) jsonResponse(['message' => 'Email and password are required.'], 422);
     $stmt = $db->prepare('SELECT id, name, email, password, role, is_active FROM users WHERE email = ? LIMIT 1');
-    $stmt->execute([$data['email']]);
-    $user = $stmt->fetch();
+    $stmt->execute([$data['email']]); $user = $stmt->fetch();
     if (!$user || !(bool) $user['is_active'] || !password_verify($data['password'], $user['password'])) jsonResponse(['message' => 'Invalid credentials.'], 401);
     if (!in_array($user['role'], ['admin', 'developer'], true)) jsonResponse(['message' => 'This account is not authorized for administration.'], 403);
-    startSession();
-    session_regenerate_id(true);
-    $_SESSION['user_id'] = (int) $user['id'];
+    startSession(); session_regenerate_id(true); $_SESSION['user_id'] = (int) $user['id'];
     unset($user['password'], $user['is_active']);
     jsonResponse(['user' => $user, 'redirect' => $user['role'] === 'developer' ? '/dev' : '/admin']);
 }
 
-if ($path === '/api/auth/logout' && $method === 'POST') {
-    startSession(); $_SESSION = []; session_destroy(); jsonResponse(['message' => 'Logged out.']);
-}
+if ($path === '/api/auth/logout' && $method === 'POST') { startSession(); $_SESSION = []; session_destroy(); jsonResponse(['message' => 'Logged out.']); }
 
-if ($path === '/api/dev/summary' && $method === 'GET') {
-    devOverview($db);
-}
-if ($path === '/api/dev/database' && $method === 'GET') {
-    devDatabase($db);
-}
-if ($path === '/api/dev/security' && $method === 'GET') {
-    devSecurity($db);
-}
-if ($path === '/api/dev/audit' && $method === 'GET') {
-    devAudit($db);
-}
+if ($path === '/api/dev/summary' && $method === 'GET') devOverview($db);
+if ($path === '/api/dev/database' && $method === 'GET') devDatabase($db);
+if ($path === '/api/dev/security' && $method === 'GET') devSecurity($db);
+if ($path === '/api/dev/audit' && $method === 'GET') devAudit($db);
+if ($path === '/api/dev/system' && $method === 'GET') devSystem($db);
+if ($path === '/api/dev/session' && $method === 'GET') devSession($db);
+if ($path === '/api/dev/diagnostics' && $method === 'GET') devDiagnostics($db);
 
-if ($path === '/api/admin/dashboard' && $method === 'GET') {
-    requireAdmin($db); adminDashboard($db);
-}
+if ($path === '/api/admin/dashboard' && $method === 'GET') { requireAdmin($db); adminDashboard($db); }
 if (strpos($path, '/api/admin/') === 0) adminCrudRoute($db, $path, $method);
 
 publicRoute($db, $path, $method);
@@ -77,15 +63,13 @@ if ($path === '/api/help-requests' && $method === 'POST') {
     $data = requestBody();
     if (empty($data['phone']) || empty($data['message'])) jsonResponse(['message' => 'Phone and message are required.'], 422);
     $stmt = $db->prepare('INSERT INTO help_requests (name, phone, message) VALUES (?, ?, ?)');
-    $stmt->execute([$data['name'] ?? null, $data['phone'], $data['message']]);
-    jsonResponse(['message' => 'Help request received.'], 201);
+    $stmt->execute([$data['name'] ?? null, $data['phone'], $data['message']]); jsonResponse(['message' => 'Help request received.'], 201);
 }
 if ($path === '/api/testimonials' && $method === 'POST') {
     $data = requestBody();
     if (empty($data['name']) || empty($data['content'])) jsonResponse(['message' => 'Name and content are required.'], 422);
     $stmt = $db->prepare('INSERT INTO testimonials (name, content, photo) VALUES (?, ?, ?)');
-    $stmt->execute([$data['name'], $data['content'], $data['photo'] ?? null]);
-    jsonResponse(['message' => 'Testimonial submitted for review.'], 201);
+    $stmt->execute([$data['name'], $data['content'], $data['photo'] ?? null]); jsonResponse(['message' => 'Testimonial submitted for review.'], 201);
 }
 
 jsonResponse(['message' => 'Route not found.'], 404);
