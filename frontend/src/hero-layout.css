@@ -1,0 +1,59 @@
+/* Hero presentation layer: keep the homepage hero generous while making inner-page heroes compact. */
+.hero-home:after{
+  content:"";
+  width:430px;
+  height:430px;
+  right:7%;
+  bottom:-2%;
+  background:url('/hero-logo.webp') center/contain no-repeat;
+  filter:blur(3px);
+  opacity:.14;
+  font-size:0;
+  line-height:1;
+}
+
+.page-hero{
+  min-height:240px;
+  padding-top:42px;
+  padding-bottom:42px;
+  background:linear-gradient(100deg,rgba(7,26,50,.96),rgba(23,61,96,.88)),url('/hero-logo.webp') 78% center/300px auto no-repeat;
+}
+
+.page-hero:after{content:none}
+
+.page-hero .eyebrow,.page-hero h1,.page-hero p{position:relative;z-index:2}
+
+.hero-actions .btn.outline{
+  border-color:rgba(255,255,255,.7);
+  background:rgba(8,29,56,.28);
+  color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,.35);
+}
+
+@media (max-width:780px){
+  .hero-home:after{
+    width:260px;
+    height:260px;
+    right:-8%;
+    bottom:1%;
+    opacity:.11;
+    filter:blur(2px);
+  }
+
+  .hero-actions .btn.outline{
+    min-height:48px;
+    border-color:rgba(255,255,255,.82);
+    background:rgba(8,29,56,.58);
+    box-shadow:0 6px 18px rgba(0,0,0,.14);
+  }
+
+  .page-hero{
+    min-height:210px;
+    padding:38px 14px;
+    background:linear-gradient(100deg,rgba(7,26,50,.97),rgba(23,61,96,.9)),url('/hero-logo.webp') 90% center/180px auto no-repeat;
+  }
+}
+
+@media (max-width:480px){
+  .page-hero{min-height:190px;background:linear-gradient(100deg,rgba(7,26,50,.98),rgba(23,61,96,.92)),url('/hero-logo.webp') 92% center/140px auto no-repeat}
+}
