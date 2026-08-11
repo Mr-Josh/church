@@ -1,16 +1,19 @@
 {
   "name": "church-readonly-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Read-only MCP server for the Church application and its security/UX audit agents.",
   "scripts": {
-    "start": "node src/server.mjs"
+    "start": "node src/server.mjs",
+    "start:http": "node src/http.mjs",
+    "check": "node --check src/server.mjs && node --check src/http.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
+    "@modelcontextprotocol/node": "^2.0.0",
     "@modelcontextprotocol/server": "^2.0.0",
     "zod": "^4.2.0"
   }
