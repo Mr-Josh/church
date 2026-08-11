@@ -6,6 +6,7 @@ import AdminResourcePage from './AdminResourcePage';
 import AdminSettings from './AdminSettings';
 import AdminRequestsPage from './AdminRequestsPage';
 import AdminContentPage from './AdminContentPage';
+import AdminUsers from './AdminUsers';
 import AdminLayout from './AdminLayout';
 import ProtectedAdminRoute from './ProtectedAdminRoute';
 
@@ -23,6 +24,7 @@ export default function AdminApp() {
           <Route path="/admin/ministries" element={<AdminResourcePage resource="ministries" />} />
           <Route path="/admin/programs" element={<AdminResourcePage resource="programs" />} />
           <Route path="/admin/events" element={<AdminResourcePage resource="events" />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
         </Route>
       </Route>
