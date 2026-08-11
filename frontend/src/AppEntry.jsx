@@ -3,6 +3,7 @@ import { BrowserRouter, useLocation } from 'react-router-dom';
 import './styles.css';
 import './responsive.css';
 import './hero-logo-fix.css';
+import './hero-layout.css';
 import AdminApp from './admin/AdminApp';
 import PublicApp from './site/PublicApp';
 
