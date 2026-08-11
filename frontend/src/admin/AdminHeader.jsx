@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-const pageMeta = {
+export const pageMeta = {
   '/admin': ['TABLEAU DE BORD', 'Bonjour Pasteur', 'Voici ce qui se passe dans votre ministère aujourd’hui.'],
   '/admin/prayer-requests': ['ADMINISTRATION', 'Demandes de prière', 'Les sujets envoyés par les visiteurs.'],
   '/admin/help-requests': ['ADMINISTRATION', "Demandes d’aide", 'Les personnes qui demandent un accompagnement.'],
@@ -15,7 +15,11 @@ const pageMeta = {
 
 export default function AdminHeader({ onMenu }) {
   const { pathname } = useLocation();
-  const [eyebrow, title, description] = pageMeta[pathname] || pageMeta['/admin'];
+
+  // The global header bar belongs exclusively to the dashboard.
+  if (pathname !== '/admin') return null;
+
+  const [eyebrow, title, description] = pageMeta['/admin'];
 
   return (
     <header className="dashboard-header admin-static-header">
@@ -23,7 +27,7 @@ export default function AdminHeader({ onMenu }) {
         <button className="mobile-menu" aria-label="Ouvrir le menu" onClick={onMenu}>☰</button>
         <div>
           <p className="dashboard-eyebrow">{eyebrow}</p>
-          <h1>{title}{pathname === '/admin' && <span> 👋</span>}</h1>
+          <h1>{title}<span> 👋</span></h1>
           <p>{description}</p>
         </div>
       </div>
