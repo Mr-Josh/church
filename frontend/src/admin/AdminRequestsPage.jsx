@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { churchApi } from '../services/churchApi';
 
 const configs = {
-  'prayer-requests': { title: 'Demandes de prière', icon: '◉', tone: 'prayer', description: 'Les sujets envoyés par les visiteurs.' },
-  'help-requests': { title: "Demandes d’aide", icon: '♡', tone: 'help', description: 'Les personnes qui demandent un accompagnement.' },
+  'prayer-requests': { icon: '◉', tone: 'prayer' },
+  'help-requests': { icon: '♡', tone: 'help' },
 };
 
 export default function AdminRequestsPage({ resource }) {
@@ -28,7 +28,7 @@ export default function AdminRequestsPage({ resource }) {
 
   return <section className="admin-panel request-page-panel">
     {error && <div className="form-error dashboard-error">{error}</div>}
-    <div className="admin-list-head"><div><h2>{config.title}</h2><p className="admin-muted">{config.description}</p></div><span>{items.length}</span></div>
+    <div className="admin-list-head"><div><p className="admin-muted">{items.length} demande{items.length > 1 ? 's' : ''} enregistrée{items.length > 1 ? 's' : ''}</p></div><span>{items.length}</span></div>
     {loading ? <p className="admin-muted">Chargement...</p> : items.length === 0 ? <div className="empty-state"><strong>Aucune demande pour le moment</strong><span>Les nouvelles demandes envoyées depuis le site apparaîtront ici.</span></div> :
       <div className="request-list">{items.map(item => <article className="request-card" key={item.id}>
         <div className={`request-icon ${config.tone}`}>{config.icon}</div>
