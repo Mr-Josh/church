@@ -23,6 +23,10 @@ CREATE TABLE church_settings (
     phone VARCHAR(50) NULL,
     whatsapp VARCHAR(50) NULL,
     email VARCHAR(190) NULL,
+    pastor_name VARCHAR(190) NULL,
+    pastor_title VARCHAR(190) NULL,
+    pastor_bio TEXT NULL,
+    pastor_photo VARCHAR(500) NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
