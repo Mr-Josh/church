@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { churchApi } from '../services/churchApi';
 import { useBibleVerse } from '../useBibleVerse';
+import './sidebar-verse.css';
 
 const navigation = [
   ['⌂', 'Dashboard', '/admin'],
