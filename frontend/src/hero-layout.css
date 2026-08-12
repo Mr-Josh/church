@@ -6,8 +6,8 @@
   right:7%;
   bottom:-2%;
   background:url('/hero-logo.webp') center/contain no-repeat;
-  filter:blur(3px);
-  opacity:.14;
+  filter:blur(10px);
+  opacity:.08;
   font-size:0;
   line-height:1;
 }
@@ -36,8 +36,8 @@
     height:260px;
     right:-8%;
     bottom:1%;
-    opacity:.11;
-    filter:blur(2px);
+    opacity:.06;
+    filter:blur(8px);
   }
 
   .hero-actions .btn.outline{
