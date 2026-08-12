@@ -27,6 +27,31 @@
   font-size:clamp(36px,4.8vw,62px);
 }
 
+.hero-verse{
+  min-height:78px;
+  display:grid;
+  align-content:start;
+  justify-items:start;
+  margin:22px 0 4px;
+  animation:hero-verse-slide-in .55s cubic-bezier(.22,.61,.36,1) both;
+}
+
+.hero-verse .verse{
+  margin:0;
+  max-width:920px;
+}
+
+.hero-verse>b{
+  color:var(--gold);
+  font-weight:800;
+  margin-top:6px;
+}
+
+@keyframes hero-verse-slide-in{
+  from{opacity:0;transform:translateX(28px)}
+  to{opacity:1;transform:translateX(0)}
+}
+
 .page-hero{
   min-height:330px;
   padding-top:42px;
@@ -57,6 +82,11 @@
     font-size:clamp(34px,9vw,46px);
   }
 
+  .hero-verse{
+    min-height:118px;
+    margin-top:18px;
+  }
+
   .page-hero{
     min-height:300px;
     padding-top:36px;
@@ -82,4 +112,8 @@
   .page-hero{
     background-size:auto,105vw auto;
   }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .hero-verse{animation:none}
 }
