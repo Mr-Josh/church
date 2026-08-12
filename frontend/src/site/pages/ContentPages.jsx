@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CTA, PageHero, SectionTitle } from '../components';
 import { churchApi } from '../../services/churchApi';
+import { useBibleVerse } from '../../useBibleVerse';
 
 function useRemote(loader, initialValue = []) {
   const [data, setData] = useState(initialValue);
@@ -47,8 +48,9 @@ export function Home() {
   const sermons = useRemote(churchApi.sermons);
   const events = useRemote(churchApi.events);
   const testimonials = useRemote(churchApi.testimonials);
+  const verse = useBibleVerse(6000);
   return <>
-    <section className="hero-home"><div className="container hero-content"><p className="eyebrow">{settings.church_name || 'GOSPEL BREAK CHAIN MINISTRY'}</p><h1>BRISONS LES CHAÎNES<br /><span>{settings.slogan || 'PAR LE POUVOIR DE CHRIST'}</span></h1><p className="verse">« Si le Fils vous affranchit, vous serez réellement libres. » <b>Jean 8:36</b></p><div className="hero-actions"><CTA to="/programs">Nous rejoindre</CTA><CTA dark to="/prayer">Faire une demande de prière</CTA></div></div></section>
+    <section className="hero-home"><div className="container hero-content"><p className="eyebrow">{settings.church_name || 'GOSPEL BREAK CHAIN MINISTRY'}</p><h1>BRISONS LES CHAÎNES<br /><span>{settings.slogan || 'PAR LE POUVOIR DE CHRIST'}</span></h1><div className="hero-verse" key={verse.id}><p className="verse">« {verse.text} »</p><b>{verse.reference}</b></div><div className="hero-actions"><CTA to="/programs">Nous rejoindre</CTA><CTA dark to="/prayer">Faire une demande de prière</CTA></div></div></section>
     <section className="pillars"><div className="container pillar-grid">{[['ADORER DIEU','Célébrer Sa présence et Sa grandeur.','♬'],['ÉDIFIER LES ÂMES','Former des disciples matures en Christ.','♡'],['ÉVANGÉLISER LE MONDE','Partager l’Évangile avec puissance.','◎'],['IMPACTER LA SOCIÉTÉ','Être une lumière dans notre génération.','✦']].map((item) => <div className="pillar" key={item[0]}><i>{item[2]}</i><h3>{item[0]}</h3><p>{item[1]}</p></div>)}</div></section>
     <section className="section soft"><div className="container two-cols"><div><SectionTitle eyebrow="NOTRE MISSION" title="Une foi qui transforme" text={settings.mission || 'Mission non renseignée.'} /><CTA to="/about">Découvrir notre mission</CTA></div><div className="schedule-card"><h3>NOS HORAIRES DE CULTE</h3>{programs.length === 0 ? <p>Aucun programme publié.</p> : programs.map((program) => <div className="schedule-row" key={program.id}><b>{program.title}</b><span>{program.day || ''}{program.start_time ? ` · ${formatTime(program.start_time)}` : ''}{program.end_time ? ` – ${formatTime(program.end_time)}` : ''}</span></div>)}</div></div></section>
     <section className="section"><div className="container"><SectionTitle eyebrow="PROCHAINS ÉVÉNEMENTS" title="Vivons ensemble les temps forts" action={<Link to="/events" className="text-link">Voir tous →</Link>} /><div className="event-grid">{events.length === 0 ? <p>Aucun événement publié.</p> : events.slice(0, 3).map((event) => { const date = formatEventDate(event.event_date); return <article className="event-card" key={event.id}><div className="date"><b>{date.day}</b><span>{date.month}</span></div><div><span className="tag">ÉVÉNEMENT</span><h3>{event.title}</h3><p>{event.description || `${date.time}${event.location ? ` · ${event.location}` : ''}`}</p></div></article>; })}</div></div></section>
