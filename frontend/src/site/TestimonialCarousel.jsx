@@ -18,45 +18,88 @@ function normalize(items) {
 
 export function TestimonialCarousel({ items = [], autoPlay = true }) {
   const testimonials = useMemo(() => normalize(items), [items]);
-  const pairCount = Math.ceil(testimonials.length / 2);
+  const pages = useMemo(() => {
+    const result = [];
+    for (let index = 0; index < testimonials.length; index += 2) {
+      result.push(testimonials.slice(index, index + 2));
+    }
+    return result;
+  }, [testimonials]);
+
+  const pageCount = pages.length;
   const [page, setPage] = useState(0);
+  const [direction, setDirection] = useState('next');
 
   useEffect(() => {
-    setPage((current) => Math.min(current, Math.max(0, pairCount - 1)));
-  }, [pairCount]);
+    setPage((current) => Math.min(current, Math.max(0, pageCount - 1)));
+  }, [pageCount]);
+
+  const goTo = (nextPage, nextDirection) => {
+    if (pageCount <= 1) return;
+    setDirection(nextDirection);
+    setPage((nextPage + pageCount) % pageCount);
+  };
 
   useEffect(() => {
-    if (!autoPlay || pairCount <= 1) return undefined;
+    if (!autoPlay || pageCount <= 1) return undefined;
     const timer = window.setInterval(() => {
-      setPage((current) => (current + 1) % pairCount);
+      setDirection('next');
+      setPage((current) => (current + 1) % pageCount);
     }, 6000);
     return () => window.clearInterval(timer);
-  }, [autoPlay, pairCount]);
-
-  const visible = testimonials.slice(page * 2, page * 2 + 2);
+  }, [autoPlay, pageCount]);
 
   return (
     <div className="testimonial-carousel">
-      <div className="testimonial-carousel__viewport" aria-live="polite">
-        <div className="testimonial-carousel__pair">
-          {visible.map((item, index) => (
-            <blockquote className={`testimonial-slide${index === 0 ? ' testimonial-slide--featured' : ''}`} key={item.id}>
-              <span>“</span>
-              <p>{item.text}</p>
-              <b>— {item.author}</b>
-            </blockquote>
+      <div className={`testimonial-carousel__viewport testimonial-carousel__viewport--${direction}`} aria-live="polite">
+        <div
+          className="testimonial-carousel__track"
+          style={{ transform: `translate3d(-${page * 100}%, 0, 0)` }}
+        >
+          {pages.map((pair, pageIndex) => (
+            <div className="testimonial-carousel__page" key={`page-${pageIndex}`}>
+              {pair.map((item, index) => (
+                <blockquote
+                  className={`testimonial-slide${index === 0 ? ' testimonial-slide--featured' : ''}`}
+                  key={item.id}
+                >
+                  <span>“</span>
+                  <p>{item.text}</p>
+                  <b>— {item.author}</b>
+                </blockquote>
+              ))}
+            </div>
           ))}
         </div>
       </div>
-      {pairCount > 1 && (
+
+      {pageCount > 1 && (
         <div className="testimonial-carousel__controls">
-          <button type="button" aria-label="Témoignages précédents" onClick={() => setPage((current) => (current - 1 + pairCount) % pairCount)}>←</button>
+          <button
+            type="button"
+            aria-label="Témoignages précédents"
+            onClick={() => goTo(page - 1, 'previous')}
+          >
+            ←
+          </button>
           <div className="testimonial-carousel__dots" aria-label="Pages de témoignages">
-            {Array.from({ length: pairCount }, (_, index) => (
-              <button key={index} type="button" className={index === page ? 'active' : ''} aria-label={`Afficher les témoignages ${index * 2 + 1} à ${Math.min(index * 2 + 2, testimonials.length)}`} onClick={() => setPage(index)} />
+            {pages.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                className={index === page ? 'active' : ''}
+                aria-label={`Afficher les témoignages ${index * 2 + 1} à ${Math.min(index * 2 + 2, testimonials.length)}`}
+                onClick={() => goTo(index, index > page ? 'next' : 'previous')}
+              />
             ))}
           </div>
-          <button type="button" aria-label="Témoignages suivants" onClick={() => setPage((current) => (current + 1) % pairCount)}>→</button>
+          <button
+            type="button"
+            aria-label="Témoignages suivants"
+            onClick={() => goTo(page + 1, 'next')}
+          >
+            →
+          </button>
         </div>
       )}
     </div>
