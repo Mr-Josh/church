@@ -48,6 +48,36 @@ if ($path === '/api/dev/session' && $method === 'GET') devSession($db);
 if ($path === '/api/dev/diagnostics' && $method === 'GET') devDiagnostics($db);
 
 if ($path === '/api/admin/dashboard' && $method === 'GET') { requireAdmin($db); adminDashboard($db); }
+
+// Church profile is administered as one resource. Keep this route before the
+// generic CRUD router so the public profile and the admin form share the same
+// complete field contract, including pastoral information.
+if ($path === '/api/admin/church-settings') {
+    requireAdmin($db);
+    if ($method === 'GET') {
+        $stmt = $db->query('SELECT * FROM church_settings WHERE id = 1 LIMIT 1');
+        jsonResponse(['data' => $stmt->fetch()]);
+    }
+    if ($method === 'PATCH') {
+        $data = requestBody();
+        $allowed = ['church_name','slogan','mission','vision','address','phone','whatsapp','email','pastor_name','pastor_title','pastor_bio','pastor_photo'];
+        $sets = [];
+        $values = [];
+        foreach ($allowed as $field) {
+            if (array_key_exists($field, $data)) {
+                $sets[] = "{$field} = ?";
+                $values[] = $data[$field];
+            }
+        }
+        if (!$sets) jsonResponse(['message' => 'No fields to update.'], 422);
+        $values[] = 1;
+        $stmt = $db->prepare('UPDATE church_settings SET ' . implode(', ', $sets) . ' WHERE id = ?');
+        $stmt->execute($values);
+        jsonResponse(['message' => 'Church settings updated.']);
+    }
+    jsonResponse(['message' => 'Method not allowed.'], 405);
+}
+
 if (strpos($path, '/api/admin/') === 0) adminCrudRoute($db, $path, $method);
 
 publicRoute($db, $path, $method);
