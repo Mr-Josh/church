@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { church, WHATSAPP_URL } from './config';
 import { navigation } from './data';
 import { churchApi } from '../services/churchApi';
+import { useBibleVerse } from '../useBibleVerse';
 import './footer.css';
 import './hero.css';
 
@@ -98,7 +99,22 @@ export function Footer() {
 }
 
 export function PageHero({ eyebrow = 'GOSPEL BREAK CHAIN MINISTRY', title, text }) {
-  return <section className="page-hero"><div><p className="eyebrow">{eyebrow}</p><h1>{title}</h1>{text && <p>{text}</p>}</div><div className="hero-ornament" aria-hidden="true">✦</div></section>;
+  const verse = useBibleVerse(6000);
+
+  return (
+    <section className="page-hero">
+      <div className="page-hero-content">
+        <p className="eyebrow">{eyebrow}</p>
+        <h1>{title}</h1>
+        {text && <p className="page-hero-text">{text}</p>}
+        <div className="hero-verse" key={verse.id}>
+          <p className="verse">« {verse.text} »</p>
+          <b>{verse.reference}</b>
+        </div>
+      </div>
+      <div className="hero-ornament" aria-hidden="true">✦</div>
+    </section>
+  );
 }
 
 export function SectionTitle({ eyebrow, title, text, action }) {
