@@ -17,6 +17,7 @@ function publicRoute(PDO $db, string $path, string $method): void
     if (!isset($routes[$path])) return;
     $table = $routes[$path];
     $where = $table === 'church_settings' ? 'id = 1' : ($table === 'testimonials' ? "status = 'published'" : ($table === 'gallery_items' ? '1 = 1' : "status = 'published'"));
-    $stmt = $db->query("SELECT * FROM {$table} WHERE {$where} ORDER BY id DESC");
+    $order = $table === 'testimonials' ? 'created_at DESC, id DESC' : 'id DESC';
+    $stmt = $db->query("SELECT * FROM {$table} WHERE {$where} ORDER BY {$order}");
     jsonResponse(['data' => $stmt->fetchAll()]);
 }
