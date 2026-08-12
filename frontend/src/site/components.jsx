@@ -6,6 +6,11 @@ import { churchApi } from '../services/churchApi';
 import './footer.css';
 import './hero.css';
 
+function normalizeChurchSettings(payload) {
+  const value = payload?.data;
+  return Array.isArray(value) ? (value[0] || {}) : (value || {});
+}
+
 function useChurchSettings() {
   const [settings, setSettings] = useState(church);
 
@@ -13,8 +18,8 @@ function useChurchSettings() {
     let active = true;
     churchApi.church()
       .then((payload) => {
-        const data = payload?.data;
-        if (active && data) setSettings({ ...church, ...data });
+        const data = normalizeChurchSettings(payload);
+        if (active && data && typeof data === 'object') setSettings({ ...church, ...data });
       })
       .catch(() => {});
     return () => { active = false; };
