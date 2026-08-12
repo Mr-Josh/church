@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PageHero, SectionTitle } from '../components';
+import { TestimonialCarousel } from '../TestimonialCarousel';
 import { churchApi } from '../../services/churchApi';
 import { WHATSAPP_URL } from '../config';
 
@@ -12,8 +13,7 @@ export function Testimonials() {
   const [testimonials, setTestimonials] = useState([]), [name, setName] = useState(''), [content, setContent] = useState(''), [sent, setSent] = useState(false), [error, setError] = useState('');
   useEffect(() => { let active = true; churchApi.testimonials().then((payload) => { if (!active) return; const data = Array.isArray(payload) ? payload : payload?.data; if (Array.isArray(data)) setTestimonials(data); }).catch(() => {}); return () => { active = false; }; }, []);
   const submit = async (event) => { event.preventDefault(); setError(''); setSent(false); try { await churchApi.submitTestimonial({ name, content }); setSent(true); setName(''); setContent(''); } catch (requestError) { setError(requestError.message); } };
-  const fallback = ['Ma vie a été transformée depuis que j’ai rencontré Jésus dans cette église. Gloire à Dieu !', 'J’ai retrouvé la paix grâce à la prière et à l’accompagnement reçu.', 'Ma guérison semblait impossible, mais Jésus a fait ce que les médecins n’ont pas pu faire.'];
-  return <><PageHero title="TÉMOIGNAGES" text="Découvrez des récits de vies transformées par la grâce de Dieu." /><section className="section"><div className="container testimonials"><div className="testimonial-list">{(testimonials.length ? testimonials : fallback).map((item, index) => { const text = item?.content || item; const author = item?.name || `Témoignage ${index + 1}`; return <blockquote key={item?.id || index}>“<p>{text}</p><b>— {author}</b></blockquote>; })}</div><form className="form-card" onSubmit={submit}><span className="gold-label">PARTAGER</span><h2>Votre témoignage</h2><label>Nom<input required value={name} onChange={(event) => setName(event.target.value)} /></label><label>Votre témoignage<textarea required value={content} onChange={(event) => setContent(event.target.value)} /></label>{error && <p className="form-error" role="alert">{error}</p>}{sent && <p className="form-success" role="status">Votre témoignage a été envoyé pour validation.</p>}<button className="btn" type="submit">{sent ? 'Envoyer un autre témoignage' : 'Envoyer mon témoignage'} <span>→</span></button></form></div></section></>;
+  return <><PageHero title="TÉMOIGNAGES" text="Découvrez des récits de vies transformées par la grâce de Dieu." /><section className="section"><div className="container testimonials"><div className="testimonial-list"><TestimonialCarousel items={testimonials} /></div><form className="form-card" onSubmit={submit}><span className="gold-label">PARTAGER</span><h2>Votre témoignage</h2><label>Nom<input required value={name} onChange={(event) => setName(event.target.value)} /></label><label>Votre témoignage<textarea required value={content} onChange={(event) => setContent(event.target.value)} /></label>{error && <p className="form-error" role="alert">{error}</p>}{sent && <p className="form-success" role="status">Votre témoignage a été envoyé pour validation.</p>}<button className="btn" type="submit">{sent ? 'Envoyer un autre témoignage' : 'Envoyer mon témoignage'} <span>→</span></button></form></div></section></>;
 }
 
 function RequestForm({ kind }) {
