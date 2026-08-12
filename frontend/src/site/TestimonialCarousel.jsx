@@ -39,8 +39,8 @@ export function TestimonialCarousel({ items = [], autoPlay = true }) {
     <div className="testimonial-carousel">
       <div className="testimonial-carousel__viewport" aria-live="polite">
         <div className="testimonial-carousel__pair">
-          {visible.map((item) => (
-            <blockquote className="testimonial-slide" key={item.id}>
+          {visible.map((item, index) => (
+            <blockquote className={`testimonial-slide${index === 0 ? ' testimonial-slide--featured' : ''}`} key={item.id}>
               <span>“</span>
               <p>{item.text}</p>
               <b>— {item.author}</b>
