@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { bibleVerses } from './bibleVerses';
 
-const SIX_SECONDS = 6000;
+const TEN_SECONDS = 10000;
 
 function randomIndex(exclude = -1) {
   if (bibleVerses.length <= 1) return 0;
@@ -10,7 +10,7 @@ function randomIndex(exclude = -1) {
   return index;
 }
 
-export function useBibleVerse(interval = SIX_SECONDS) {
+export function useBibleVerse(interval = TEN_SECONDS) {
   const [index, setIndex] = useState(() => randomIndex());
 
   useEffect(() => {
