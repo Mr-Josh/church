@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { churchApi } from '../services/churchApi';
+import { useBibleVerse } from '../useBibleVerse';
 
 const navigation = [
   ['⌂', 'Dashboard', '/admin'],
@@ -16,6 +17,7 @@ const navigation = [
 export default function AdminSidebar({ open = false, onClose }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const verse = useBibleVerse(6000);
   const isActive = (to) => to === '/admin' ? location.pathname === '/admin' : Boolean(to && location.pathname.startsWith(to));
   const logout = async () => { try { await churchApi.logout(); } finally { navigate('/admin/login', { replace: true }); onClose?.(); } };
 
@@ -30,7 +32,7 @@ export default function AdminSidebar({ open = false, onClose }) {
           : <Link key={label} className={`sidebar-link ${isActive(to) ? 'active' : ''}`} to={to} onClick={onClose} aria-current={isActive(to) ? 'page' : undefined}><i>{icon}</i><span>{label}</span>{key && <SidebarBadge resource={key} />}</Link>)}
       </nav>
       <button className="admin-logout" onClick={logout}><i>↪</i><span>Déconnexion</span></button>
-      <div className="sidebar-verse"><span>“</span><p>Si donc le Fils vous affranchit, vous serez réellement libres.</p><strong>Jean 8:36</strong></div>
+      <div className="sidebar-verse" key={verse.id}><span>“</span><p>{verse.text}</p><strong>{verse.reference}</strong></div>
       <small className="sidebar-footer">© 2026 Gospel Break Chain Ministry</small>
     </aside>
   </>;
