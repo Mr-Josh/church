@@ -2,196 +2,80 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CTA, PageHero, SectionTitle } from '../components';
 import { churchApi } from '../../services/churchApi';
-import { ministries as fallbackMinistries, programs as fallbackPrograms, sermons as fallbackSermons } from '../data';
 
-function useRemote(loader, fallbackValue) {
-  const [data, setData] = useState(fallbackValue);
-
+function useRemote(loader, initialValue = []) {
+  const [data, setData] = useState(initialValue);
   useEffect(() => {
     let active = true;
-    loader()
-      .then((payload) => {
-        if (!active) return;
-        const value = Array.isArray(payload) ? payload : payload?.data;
-        if (Array.isArray(value)) setData(value);
-      })
-      .catch(() => {
-        // churchApi already exposes the global request/error state; keep the local fallback visible.
-      });
-
-    return () => {
-      active = false;
-    };
+    loader().then((payload) => {
+      const value = Array.isArray(payload) ? payload : payload?.data;
+      if (active && Array.isArray(value)) setData(value);
+    }).catch(() => {});
+    return () => { active = false; };
   }, [loader]);
-
   return data;
 }
 
-const fallbackEvents = [
-  'Campagne de délivrance',
-  'Conférence des jeunes',
-  'Veillée de prière',
-  'Séminaire biblique',
-  'Jeûne & prière',
-  'Journée d’évangélisation',
-];
+function useChurchSettings() {
+  const [settings, setSettings] = useState({});
+  useEffect(() => {
+    let active = true;
+    churchApi.church().then((payload) => {
+      if (active && payload?.data) setSettings(payload.data);
+    }).catch(() => {});
+    return () => { active = false; };
+  }, []);
+  return settings;
+}
 
-const fallbackGallery = Array.from({ length: 12 }, (_, index) => ({
-  id: `fallback-${index + 1}`,
-  title: `Album ${index + 1}`,
-}));
-
-function collectionName(item, fallback = '') {
-  return item?.name || item?.title || item?.label || fallback;
+function formatTime(value) { return value ? String(value).slice(0, 5) : ''; }
+function formatEventDate(value) {
+  if (!value) return { day: '', month: '', time: '' };
+  const date = new Date(String(value).replace(' ', 'T'));
+  if (Number.isNaN(date.getTime())) return { day: '', month: '', time: '' };
+  return {
+    day: String(date.getDate()).padStart(2, '0'),
+    month: date.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '').toUpperCase(),
+    time: date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+  };
 }
 
 export function Home() {
-  const programs = useRemote(churchApi.programs, fallbackPrograms);
-  const ministries = useRemote(churchApi.ministries, fallbackMinistries);
-  const sermons = useRemote(churchApi.sermons, fallbackSermons);
-  const events = useRemote(churchApi.events, []);
-  const testimonials = useRemote(churchApi.testimonials, []);
-
-  return (
-    <>
-      <section className="hero-home">
-        <div className="container hero-content">
-          <p className="eyebrow">GOSPEL BREAK CHAIN MINISTRY</p>
-          <h1>BRISONS LES CHAÎNES<br /><span>PAR LE POUVOIR DE CHRIST</span></h1>
-          <p className="verse">« Si le Fils vous affranchit, vous serez réellement libres. » <b>Jean 8:36</b></p>
-          <div className="hero-actions">
-            <CTA to="/programs">Nous rejoindre</CTA>
-            <CTA dark to="/prayer">Faire une demande de prière</CTA>
-          </div>
-        </div>
-      </section>
-
-      <section className="pillars">
-        <div className="container pillar-grid">
-          {[
-            ['ADORER DIEU', 'Célébrer Sa présence et Sa grandeur.', '♬'],
-            ['ÉDIFIER LES ÂMES', 'Former des disciples matures en Christ.', '♡'],
-            ['ÉVANGÉLISER LE MONDE', 'Partager l’Évangile avec puissance.', '◎'],
-            ['IMPACTER LA SOCIÉTÉ', 'Être une lumière dans notre génération.', '✦'],
-          ].map((item) => (
-            <div className="pillar" key={item[0]}><i>{item[2]}</i><h3>{item[0]}</h3><p>{item[1]}</p></div>
-          ))}
-        </div>
-      </section>
-
-      <section className="section soft">
-        <div className="container two-cols">
-          <div>
-            <SectionTitle eyebrow="NOTRE MISSION" title="Une foi qui transforme" text="Gagner les âmes, faire des disciples, impacter notre génération par la parole de Dieu et l’amour du Christ." />
-            <CTA to="/about">Découvrir notre mission</CTA>
-          </div>
-          <div className="schedule-card">
-            <h3>NOS HORAIRES DE CULTE</h3>
-            {programs.map((program, index) => (
-              <div className="schedule-row" key={program?.id || collectionName(program, `program-${index}`)}>
-                <b>{collectionName(program, program?.[0])}</b>
-                <span>{program?.day || program?.weekday || program?.[1]} · {program?.time || program?.[2]}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <SectionTitle eyebrow="PROCHAINS ÉVÉNEMENTS" title="Vivons ensemble les temps forts" action={<Link to="/events" className="text-link">Voir tous →</Link>} />
-          <div className="event-grid">
-            {(events.length ? events : fallbackEvents).slice(0, 3).map((event, index) => {
-              const name = collectionName(event, event);
-              return (
-                <article className="event-card" key={event?.id || name}>
-                  <div className="date"><b>{18 + index * 5}</b><span>MAI</span></div>
-                  <div><span className="tag">ÉVÉNEMENT</span><h3>{name}</h3><p>{event?.description || 'Temple Principal · à partir de 18h00'}</p></div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="section dark-section">
-        <div className="container pastor-highlight">
-          <div className="pastor-placeholder"><span>PASTEUR</span><b>Jean Emmanuel</b></div>
-          <div><span className="gold-label">MOT DU PASTEUR</span><blockquote>« Notre vision est de voir des vies transformées, des foyers rétablis et des destinées accomplies par le pouvoir de Jésus-Christ. »</blockquote><p>Pasteur Jean Emmanuel</p><CTA dark to="/pastor">En savoir plus sur le pasteur</CTA></div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <SectionTitle eyebrow="NOS MINISTÈRES" title="Servir, grandir et impacter" action={<Link to="/ministries" className="text-link">Découvrir tous nos ministères →</Link>} />
-          <div className="ministry-grid home-ministry">
-            {ministries.slice(0, 6).map((ministry, index) => {
-              const name = collectionName(ministry, ministry?.[0] || `ministry-${index}`);
-              return <Link to="/ministries" className="ministry-card" key={ministry?.id || name}><i>{ministry?.icon || ministry?.[2] || '✦'}</i><h3>{name}</h3><p>{ministry?.description || ministry?.[1]}</p></Link>;
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="section soft">
-        <div className="container media-grid">
-          <div>
-            <SectionTitle eyebrow="DERNIÈRES PRÉDICATIONS" title="La Parole au cœur de nos vies" action={<Link to="/sermons" className="text-link">Voir toutes →</Link>} />
-            <div className="sermon-grid">
-              {sermons.slice(0, 3).map((sermon, index) => {
-                const name = collectionName(sermon, sermon?.[0] || `sermon-${index}`);
-                return <Link to="/sermons" className="sermon-card" key={sermon?.id || name}><div className="media-thumb"><span>▶</span><em>{sermon?.duration || sermon?.[1]}</em></div><h3>{name}</h3><p>{sermon?.type || sermon?.category || sermon?.[2]} · récemment</p></Link>;
-              })}
-            </div>
-          </div>
-          <div>
-            <SectionTitle eyebrow="TÉMOIGNAGES" title="Des vies transformées" />
-            <div className="quote-card">
-              <span>“</span>
-              <p>{testimonials[0]?.content || 'Ma vie a été complètement transformée depuis que j’ai rencontré Jésus-Christ dans cette église.'}</p>
-              <b>— {testimonials[0]?.name || 'Marie N.'}</b>
-              <CTA to="/testimonials">Partager votre témoignage</CTA>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="donation-banner"><div><span className="gold-label">SOUTENEZ L’ŒUVRE DE DIEU</span><h2>Votre don aide à transformer des vies et à propager l’Évangile.</h2></div><CTA to="/donate">Faire un don maintenant</CTA></section>
-    </>
-  );
+  const settings = useChurchSettings();
+  const programs = useRemote(churchApi.programs);
+  const ministries = useRemote(churchApi.ministries);
+  const sermons = useRemote(churchApi.sermons);
+  const events = useRemote(churchApi.events);
+  const testimonials = useRemote(churchApi.testimonials);
+  return <>
+    <section className="hero-home"><div className="container hero-content"><p className="eyebrow">{settings.church_name || 'GOSPEL BREAK CHAIN MINISTRY'}</p><h1>BRISONS LES CHAÎNES<br /><span>{settings.slogan || 'PAR LE POUVOIR DE CHRIST'}</span></h1><p className="verse">« Si le Fils vous affranchit, vous serez réellement libres. » <b>Jean 8:36</b></p><div className="hero-actions"><CTA to="/programs">Nous rejoindre</CTA><CTA dark to="/prayer">Faire une demande de prière</CTA></div></div></section>
+    <section className="pillars"><div className="container pillar-grid">{[['ADORER DIEU','Célébrer Sa présence et Sa grandeur.','♬'],['ÉDIFIER LES ÂMES','Former des disciples matures en Christ.','♡'],['ÉVANGÉLISER LE MONDE','Partager l’Évangile avec puissance.','◎'],['IMPACTER LA SOCIÉTÉ','Être une lumière dans notre génération.','✦']].map((item) => <div className="pillar" key={item[0]}><i>{item[2]}</i><h3>{item[0]}</h3><p>{item[1]}</p></div>)}</div></section>
+    <section className="section soft"><div className="container two-cols"><div><SectionTitle eyebrow="NOTRE MISSION" title="Une foi qui transforme" text={settings.mission || 'Mission non renseignée.'} /><CTA to="/about">Découvrir notre mission</CTA></div><div className="schedule-card"><h3>NOS HORAIRES DE CULTE</h3>{programs.length === 0 ? <p>Aucun programme publié.</p> : programs.map((program) => <div className="schedule-row" key={program.id}><b>{program.title}</b><span>{program.day || ''}{program.start_time ? ` · ${formatTime(program.start_time)}` : ''}{program.end_time ? ` – ${formatTime(program.end_time)}` : ''}</span></div>)}</div></div></section>
+    <section className="section"><div className="container"><SectionTitle eyebrow="PROCHAINS ÉVÉNEMENTS" title="Vivons ensemble les temps forts" action={<Link to="/events" className="text-link">Voir tous →</Link>} /><div className="event-grid">{events.length === 0 ? <p>Aucun événement publié.</p> : events.slice(0, 3).map((event) => { const date = formatEventDate(event.event_date); return <article className="event-card" key={event.id}><div className="date"><b>{date.day}</b><span>{date.month}</span></div><div><span className="tag">ÉVÉNEMENT</span><h3>{event.title}</h3><p>{event.description || `${date.time}${event.location ? ` · ${event.location}` : ''}`}</p></div></article>; })}</div></div></section>
+    <section className="section dark-section"><div className="container pastor-highlight"><div className="pastor-placeholder"><span>PASTEUR</span><b>{settings.pastor_name || 'Jean Emmanuel'}</b></div><div><span className="gold-label">MOT DU PASTEUR</span><blockquote>{settings.pastor_bio || settings.vision || 'Notre vision est de voir des vies transformées et des destinées accomplies par le pouvoir de Jésus-Christ.'}</blockquote><p>{settings.pastor_name || 'Pasteur Jean Emmanuel'}</p><CTA dark to="/pastor">En savoir plus sur le pasteur</CTA></div></div></section>
+    <section className="section"><div className="container"><SectionTitle eyebrow="NOS MINISTÈRES" title="Servir, grandir et impacter" action={<Link to="/ministries" className="text-link">Découvrir tous nos ministères →</Link>} /><div className="ministry-grid home-ministry">{ministries.length === 0 ? <p>Aucun ministère publié.</p> : ministries.slice(0, 6).map((ministry) => <Link to="/ministries" className="ministry-card" key={ministry.id}><i>✦</i><h3>{ministry.name}</h3><p>{ministry.description}</p></Link>)}</div></div></section>
+    <section className="section soft"><div className="container media-grid"><div><SectionTitle eyebrow="DERNIÈRES PRÉDICATIONS" title="La Parole au cœur de nos vies" action={<Link to="/sermons" className="text-link">Voir toutes →</Link>} /><div className="sermon-grid">{sermons.length === 0 ? <p>Aucune prédication publiée.</p> : sermons.slice(0, 3).map((sermon) => <a href={sermon.video_url || sermon.audio_url || sermon.pdf_url || '#'} className="sermon-card" key={sermon.id}><div className="media-thumb"><span>▶</span></div><h3>{sermon.title}</h3><p>{sermon.preacher || 'Prédication'} · récemment</p></a>)}</div></div><div><SectionTitle eyebrow="TÉMOIGNAGES" title="Des vies transformées" /><div className="quote-card"><span>“</span>{testimonials.length === 0 ? <p>Aucun témoignage publié pour le moment.</p> : <><p>{testimonials[0].content}</p><b>— {testimonials[0].name}</b></>}<CTA to="/testimonials">Partager votre témoignage</CTA></div></div></div></section>
+    <section className="donation-banner"><div><span className="gold-label">SOUTENEZ L’ŒUVRE DE DIEU</span><h2>Votre don aide à transformer des vies et à propager l’Évangile.</h2></div><CTA to="/donate">Faire un don maintenant</CTA></section>
+  </>;
 }
 
 export function About() {
-  return <><PageHero title="À PROPOS DE NOUS" text="Découvrez notre histoire, notre vision, notre mission et les valeurs qui nous guident." /><section className="section"><div className="container three-cards"><article><span>◫</span><h2>NOTRE HISTOIRE</h2><p>Gospel Break Chain Ministry a été fondée par la vision de Dieu pour briser les chaînes et apporter la délivrance, la guérison et la restauration à tous ceux qui sont liés.</p><CTA to="/pastor">Notre parcours</CTA></article><article><span>◎</span><h2>NOTRE VISION</h2><p>Être une église passionnée par la présence de Dieu et la transformation des nations.</p></article><article><span>✦</span><h2>NOTRE MISSION</h2><p>Gagner les âmes, faire des disciples, impacter notre génération par la Parole de Dieu et l’amour du Christ.</p></article></div></section><section className="section soft"><div className="container"><SectionTitle eyebrow="NOS VALEURS" title="Ce qui nous guide" /><div className="values">{['Amour', 'Intégrité', 'Puissance', 'Unité', 'Sainteté', 'Excellence'].map((v) => <div key={v}><i>✓</i><b>{v}</b></div>)}</div></div></section></>;
+  const settings = useChurchSettings();
+  return <><PageHero title="À PROPOS DE NOUS" text="Découvrez notre histoire, notre vision, notre mission et les valeurs qui nous guident." /><section className="section"><div className="container three-cards"><article><span>◫</span><h2>NOTRE ÉGLISE</h2><p>{settings.church_name || 'Notre église'}</p><CTA to="/pastor">Notre parcours</CTA></article><article><span>◎</span><h2>NOTRE VISION</h2><p>{settings.vision || 'Vision non renseignée.'}</p></article><article><span>✦</span><h2>NOTRE MISSION</h2><p>{settings.mission || 'Mission non renseignée.'}</p></article></div></section><section className="section soft"><div className="container"><SectionTitle eyebrow="NOTRE ENGAGEMENT" title={settings.slogan || 'Une foi qui transforme'} text={settings.mission || settings.vision || 'Notre engagement est de servir Dieu et les personnes qui nous sont confiées.'} /></div></section></>;
 }
 
 export function Pastor() {
-  return <><PageHero eyebrow="NOTRE PASTEUR" title="Pasteur Jean Emmanuel" text="Fondateur & Pasteur Principal de Gospel Break Chain Ministry." /><section className="section"><div className="container pastor-layout"><div className="pastor-photo"><span>PHOTO DU PASTEUR</span><b>Jean Emmanuel</b></div><article className="message-card"><span className="gold-label">MOT DU PASTEUR</span><h2>Une vision pour restaurer des vies</h2><p>La vision de Dieu pour cette église est simple : gagner les âmes, bâtir des disciples et impacter notre génération par la parole de Dieu et l’amour du Christ.</p><p>Dieu nous a appelés à briser les chaînes de la délivrance, de la guérison et de la restauration. Nous croyons que personne n’est trop loin de la grâce de Dieu.</p><p className="signature">Pasteur Jean Emmanuel</p></article></div></section><section className="section soft"><div className="container timeline-cols"><div><SectionTitle eyebrow="PARCOURS" title="Un appel au service" /><div className="timeline">{[['2005', 'Conversion et appel au ministère'], ['2008', 'Formation biblique et théologique'], ['2010', 'Début du ministère de délivrance et d’enseignements'], ['2016', 'Fondation de Gospel Break Chain Ministry'], ['Aujourd’hui', 'Pasteur principal et visionnaire de l’œuvre']].map((x) => <div key={x[0]}><b>{x[0]}</b><span>{x[1]}</span></div>)}</div></div><div><SectionTitle eyebrow="VALEURS PASTORALES" title="Servir avec conviction" /><ul className="check-list">{['La Parole de Dieu comme fondement', 'L’amour pour les âmes', 'L’intégrité et la transparence', 'La puissance du Saint-Esprit', 'L’unité du corps de Christ'].map((v) => <li key={v}>✓ {v}</li>)}</ul></div></div></section></>;
+  const settings = useChurchSettings();
+  const name = settings.pastor_name || 'Jean Emmanuel';
+  const title = settings.pastor_title || 'Fondateur & Pasteur Principal';
+  const bio = settings.pastor_bio || settings.vision || 'La vision de Dieu pour cette église est de gagner les âmes, bâtir des disciples et impacter notre génération.';
+  return <><PageHero eyebrow="NOTRE PASTEUR" title={name} text={title} /><section className="section"><div className="container pastor-layout"><div className="pastor-photo">{settings.pastor_photo ? <img src={settings.pastor_photo} alt={name} /> : <><span>PHOTO DU PASTEUR</span><b>{name}</b></>}</div><article className="message-card"><span className="gold-label">MOT DU PASTEUR</span><h2>Une vision pour restaurer des vies</h2><p>{bio}</p><p>{settings.mission || 'Servir avec amour, intégrité et excellence.'}</p><p className="signature">{name}</p></article></div></section><section className="section soft"><div className="container timeline-cols"><div><SectionTitle eyebrow="VISION" title="Servir avec conviction" /><p>{settings.vision || 'Vision non renseignée.'}</p></div><div><SectionTitle eyebrow="MISSION" title="Une mission claire" /><p>{settings.mission || 'Mission non renseignée.'}</p></div></div></section></>;
 }
 
-function CollectionPage({ loader, title, text, fallbackData, render }) {
-  const data = useRemote(loader, fallbackData);
-  return <><PageHero title={title} text={text} /><section className="section"><div className="container">{render(data)}</div></section></>;
-}
+function CollectionPage({ loader, title, text, render }) { const data = useRemote(loader); return <><PageHero title={title} text={text} /><section className="section"><div className="container">{render(data)}</div></section></>; }
 
-export function Ministries() {
-  return <CollectionPage loader={churchApi.ministries} title="NOS MINISTÈRES" text="Découvrir les espaces où chacun peut servir, grandir et contribuer à l’œuvre de Dieu." fallbackData={fallbackMinistries} render={(data) => <div className="ministry-grid">{data.map((ministry, index) => { const name = collectionName(ministry, ministry?.[0] || `ministry-${index}`); return <article className="ministry-card large" key={ministry?.id || name}><i>{ministry?.icon || ministry?.[2] || '✦'}</i><h2>{name}</h2><p>{ministry?.description || ministry?.[1]}</p><Link to="/contact">En savoir plus →</Link></article>; })}</div>} />;
-}
-
-export function Programs() {
-  return <CollectionPage loader={churchApi.programs} title="NOS PROGRAMMES" text="Retrouvez les rendez-vous réguliers de la communauté." fallbackData={fallbackPrograms} render={(data) => <div className="schedule-list">{data.map((program, index) => <article key={program?.id || collectionName(program, program?.[0] || `program-${index}`)}><div className="program-icon">◷</div><div><span className="gold-label">{program?.day || program?.weekday || program?.[1]}</span><h2>{collectionName(program, program?.[0])}</h2><p>{program?.description || program?.[3]}</p></div><strong>{program?.time || program?.[2]}</strong></article>)}</div>} />;
-}
-
-export function Events() {
-  return <CollectionPage loader={churchApi.events} title="ÉVÉNEMENTS" text="Les prochains temps forts de Gospel Break Chain Ministry." fallbackData={[]} render={(data) => <div className="event-grid big">{(data.length ? data : fallbackEvents).map((event, index) => { const name = collectionName(event, event); return <article className="event-feature" key={event?.id || name}><div className="event-image"><span>{String(index + 1).padStart(2, '0')}</span></div><div className="event-body"><span className="tag">À VENIR</span><h2>{name}</h2><p>{event?.description || 'Un temps de communion, de prière et d’enseignement autour de la Parole de Dieu.'}</p><b>{event?.time || '18h00'} · {event?.location || 'Temple Principal'}</b><Link to="/contact">Plus d’informations →</Link></div></article>; })}</div>} />;
-}
-
-export function Sermons() {
-  return <CollectionPage loader={churchApi.sermons} title="PRÉDICATIONS" text="Écoutez, regardez et méditez les enseignements du ministère." fallbackData={fallbackSermons} render={(data) => <><div className="filters"><button className="selected" type="button">Toutes</button><button type="button">Vidéos</button><button type="button">Audios</button><button type="button">PDF</button></div><div className="sermon-grid full">{data.map((sermon, index) => { const name = collectionName(sermon, sermon?.[0] || `sermon-${index}`); return <article className="sermon-card" key={sermon?.id || name}><div className="media-thumb"><span>▶</span><em>{sermon?.duration || sermon?.[1]}</em></div><h2>{name}</h2><p>{sermon?.type || sermon?.category || sermon?.[2]} · Pasteur Jean Emmanuel</p></article>; })}</div></>} />;
-}
-
-export function Gallery() {
-  const gallery = useRemote(churchApi.gallery, fallbackGallery);
-
-  return <><PageHero title="GALERIE" text="Quelques instants de vie, de service et de communion." /><section className="section"><div className="container gallery-grid">{gallery.map((item, index) => { const title = collectionName(item, `Album ${index + 1}`); const image = item?.image_url || item?.imageUrl || item?.url || item?.src; return <div className="gallery-item" key={item?.id || title}><span>{image ? <img src={image} alt={title} loading="lazy" /> : 'GBCM'}</span><b>{title}</b></div>; })}</div></section></>;
-}
+export function Ministries() { return <CollectionPage loader={churchApi.ministries} title="NOS MINISTÈRES" text="Découvrir les espaces où chacun peut servir, grandir et contribuer à l’œuvre de Dieu." render={(data) => data.length === 0 ? <p>Aucun ministère publié.</p> : <div className="ministry-grid">{data.map((ministry) => <article className="ministry-card large" key={ministry.id}><i>✦</i><h2>{ministry.name}</h2><p>{ministry.description}</p><Link to="/contact">En savoir plus →</Link></article>)}</div>} />; }
+export function Programs() { return <CollectionPage loader={churchApi.programs} title="NOS PROGRAMMES" text="Retrouvez les rendez-vous réguliers de la communauté." render={(data) => data.length === 0 ? <p>Aucun programme publié.</p> : <div className="schedule-list">{data.map((program) => <article key={program.id}><div className="program-icon">◷</div><div><span className="gold-label">{program.day || ''}</span><h2>{program.title}</h2><p>{program.description}</p></div><strong>{formatTime(program.start_time)}{program.end_time ? ` – ${formatTime(program.end_time)}` : ''}</strong></article>)}</div>} />; }
+export function Events() { return <CollectionPage loader={churchApi.events} title="ÉVÉNEMENTS" text="Les prochains temps forts de Gospel Break Chain Ministry." render={(data) => data.length === 0 ? <p>Aucun événement publié.</p> : <div className="event-grid big">{data.map((event, index) => { const date = formatEventDate(event.event_date); return <article className="event-feature" key={event.id}><div className="event-image">{event.image ? <img src={event.image} alt={event.title} /> : <span>{String(index + 1).padStart(2, '0')}</span>}</div><div className="event-body"><span className="tag">À VENIR</span><h2>{event.title}</h2><p>{event.description}</p><b>{date.time}{event.location ? ` · ${event.location}` : ''}</b><Link to="/contact">Plus d’informations →</Link></div></article>; })}</div>} />; }
+export function Sermons() { return <CollectionPage loader={churchApi.sermons} title="PRÉDICATIONS" text="Écoutez, regardez et méditez les enseignements du ministère." render={(data) => data.length === 0 ? <p>Aucune prédication publiée.</p> : <div className="sermon-grid full">{data.map((sermon) => { const href = sermon.video_url || sermon.audio_url || sermon.pdf_url; return <article className="sermon-card" key={sermon.id}><div className="media-thumb"><span>▶</span></div><h2>{sermon.title}</h2><p>{sermon.preacher || 'Prédication'}</p>{sermon.description && <p>{sermon.description}</p>}{href && <a href={href} target="_blank" rel="noreferrer">Accéder au contenu →</a>}</article>; })}</div>} />; }
+export function Gallery() { return <CollectionPage loader={churchApi.gallery} title="GALERIE" text="Découvrez les images et vidéos de la vie de l’église." render={(data) => data.length === 0 ? <p>Aucun élément dans la galerie.</p> : <div className="gallery-grid">{data.map((item) => <article className="gallery-item" key={item.id}>{item.type === 'video' ? <video controls src={item.file_url} /> : <img src={item.file_url} alt={item.title || 'Galerie'} />}{item.title && <h3>{item.title}</h3>}</article>)}</div>} />; }
