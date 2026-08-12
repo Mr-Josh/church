@@ -16,8 +16,14 @@ async function request(path, options = {}) {
   } catch (error) { requestFailed(method, path, error, retry); throw error; }
 }
 
+async function requestChurchSettings() {
+  const payload = await request('/church');
+  const value = payload?.data;
+  return { ...payload, data: Array.isArray(value) ? (value[0] || {}) : (value || {}) };
+}
+
 export const churchApi = {
-  health: () => request('/health'), church: () => request('/church'), ministries: () => request('/ministries'), programs: () => request('/programs'), events: () => request('/events'), sermons: () => request('/sermons'), gallery: () => request('/gallery'), testimonials: () => request('/testimonials'),
+  health: () => request('/health'), church: requestChurchSettings, ministries: () => request('/ministries'), programs: () => request('/programs'), events: () => request('/events'), sermons: () => request('/sermons'), gallery: () => request('/gallery'), testimonials: () => request('/testimonials'),
   submitPrayerRequest: (data) => request('/prayer-requests', { method: 'POST', body: JSON.stringify(data) }),
   submitHelpRequest: (data) => request('/help-requests', { method: 'POST', body: JSON.stringify(data) }),
   submitTestimonial: (data) => request('/testimonials', { method: 'POST', body: JSON.stringify(data) }),
