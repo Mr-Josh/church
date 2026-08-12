@@ -1,0 +1,7 @@
+USE church;
+
+ALTER TABLE church_settings
+    ADD COLUMN IF NOT EXISTS pastor_name VARCHAR(190) NULL,
+    ADD COLUMN IF NOT EXISTS pastor_title VARCHAR(190) NULL,
+    ADD COLUMN IF NOT EXISTS pastor_bio TEXT NULL,
+    ADD COLUMN IF NOT EXISTS pastor_photo VARCHAR(500) NULL;
