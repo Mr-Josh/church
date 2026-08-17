@@ -1,11 +1,23 @@
-import { Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { Footer, Header } from './components';
 import { Home, About, Pastor, Ministries, Programs, Events, Sermons, Gallery } from './pages/ContentPages';
 import { Testimonials, Prayer, Evangelism, Help, Contact, Donate } from './pages/InteractionPages';
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [pathname]);
+
+  return null;
+}
+
 export default function PublicApp() {
   return (
     <div className="public-site">
+      <ScrollToTop />
       <Header />
       <main>
         <Routes>
