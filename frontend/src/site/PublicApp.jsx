@@ -5,7 +5,7 @@ import { Testimonials, Prayer, Evangelism, Help, Contact, Donate } from './pages
 
 export default function PublicApp() {
   return (
-    <>
+    <div className="public-site">
       <Header />
       <main>
         <Routes>
@@ -27,6 +27,6 @@ export default function PublicApp() {
         </Routes>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

@@ -6,6 +6,7 @@ import { churchApi } from '../services/churchApi';
 import { useBibleVerse } from '../useBibleVerse';
 import './footer.css';
 import './hero.css';
+import './fixed-navbar.css';
 
 function normalizeChurchSettings(payload) {
   const value = payload?.data;
@@ -36,7 +37,7 @@ export function Header() {
   const whatsapp = settings.whatsapp ? `https://wa.me/${String(settings.whatsapp).replace(/\D/g, '')}` : WHATSAPP_URL;
 
   return (
-    <>
+    <div className="site-header">
       <div className="topbar">
         <div>
           ☎ {settings.phone} <span>•</span> <a href={whatsapp}>WhatsApp</a> <span>•</span> {settings.email}
@@ -64,7 +65,7 @@ export function Header() {
           <Link className="donate-btn" onClick={() => setOpen(false)} to="/donate">Faire un don</Link>
         </nav>
       </header>
-    </>
+    </div>
   );
 }
 
