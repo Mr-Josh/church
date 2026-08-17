@@ -15,54 +15,40 @@ function normalizeChurchSettings(payload) {
 
 function useChurchSettings() {
   const [settings, setSettings] = useState(church);
-
   useEffect(() => {
     let active = true;
-    churchApi.church()
-      .then((payload) => {
-        const data = normalizeChurchSettings(payload);
-        if (active && data && typeof data === 'object') setSettings({ ...church, ...data });
-      })
-      .catch(() => {});
+    churchApi.church().then((payload) => {
+      const data = normalizeChurchSettings(payload);
+      if (active && data && typeof data === 'object') setSettings({ ...church, ...data });
+    }).catch(() => {});
     return () => { active = false; };
   }, []);
-
   return settings;
+}
+
+function scrollToPageTop() {
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 }
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const settings = useChurchSettings();
-  const whatsapp = settings.whatsapp ? `https://wa.me/${String(settings.whatsapp).replace(/\D/g, '')}` : WHATSAPP_URL;
 
   return (
     <div className="site-header">
-      <div className="topbar">
-        <div>
-          ☎ {settings.phone} <span>•</span> <a href={whatsapp}>WhatsApp</a> <span>•</span> {settings.email}
-        </div>
-        <div>Suivez-nous : ◉ ◉ ◉</div>
-      </div>
       <header className="header">
-        <Link className="brand" to="/" aria-label={`Accueil ${settings.church_name || settings.name}`}>
+        <Link className="brand" to="/" onClick={scrollToPageTop} aria-label={`Accueil ${settings.church_name || settings.name}`}>
           <img src="/logo.svg" alt={settings.church_name || settings.name} />
         </Link>
-        <button
-          className="menu-toggle"
-          onClick={() => setOpen((value) => !value)}
-          aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
-          aria-expanded={open}
-        >
-          ☰
-        </button>
+        <button className="menu-toggle" onClick={() => setOpen((value) => !value)} aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={open}>☰</button>
         <nav className={open ? 'nav open' : 'nav'} aria-label="Navigation principale">
           {navigation.map(([to, label]) => (
-            <Link key={to} className={location.pathname === to ? 'active' : ''} onClick={() => setOpen(false)} to={to}>
+            <Link key={to} className={location.pathname === to ? 'active' : ''} onClick={() => { setOpen(false); scrollToPageTop(); }} to={to}>
               {label}
             </Link>
           ))}
-          <Link className="donate-btn" onClick={() => setOpen(false)} to="/donate">Faire un don</Link>
+          <Link className="donate-btn" onClick={() => { setOpen(false); scrollToPageTop(); }} to="/donate">Faire un don</Link>
         </nav>
       </header>
     </div>
@@ -73,6 +59,7 @@ export function Footer() {
   const settings = useChurchSettings();
   const whatsapp = settings.whatsapp ? `https://wa.me/${String(settings.whatsapp).replace(/\D/g, '')}` : WHATSAPP_URL;
   const name = settings.church_name || settings.name || church.name;
+  const footerLinkProps = { onClick: scrollToPageTop };
 
   return (
     <footer className="footer">
@@ -83,15 +70,15 @@ export function Footer() {
         </div>
         <div className="footer-group">
           <h4>Liens rapides</h4>
-          <Link to="/about">À propos</Link><Link to="/ministries">Ministères</Link><Link to="/events">Événements</Link><Link to="/contact">Contact</Link>
+          <Link {...footerLinkProps} to="/about">À propos</Link><Link {...footerLinkProps} to="/ministries">Ministères</Link><Link {...footerLinkProps} to="/events">Événements</Link><Link {...footerLinkProps} to="/contact">Contact</Link>
         </div>
         <div className="footer-group">
           <h4>Nos services</h4>
-          <Link to="/prayer">Demande de prière</Link><Link to="/donate">Faire un don</Link><Link to="/sermons">Prédications</Link><Link to="/testimonials">Témoignages</Link><Link to="/help">Assistance</Link>
+          <Link {...footerLinkProps} to="/prayer">Demande de prière</Link><Link {...footerLinkProps} to="/donate">Faire un don</Link><Link {...footerLinkProps} to="/sermons">Prédications</Link><Link {...footerLinkProps} to="/testimonials">Témoignages</Link><Link {...footerLinkProps} to="/help">Assistance</Link>
         </div>
         <div className="footer-group footer-contact-group">
           <h4>Contactez-nous</h4>
-          <span>{settings.address}</span><span>{settings.phone}</span><span>{settings.email}</span><a href={whatsapp}>WhatsApp</a><Link className="footer-pastor-link" to="/admin">Espace Pasteur →</Link>
+          <span>{settings.address}</span><span>{settings.phone}</span><span>{settings.email}</span><a href={whatsapp}>WhatsApp</a><Link className="footer-pastor-link" {...footerLinkProps} to="/admin">Espace Pasteur →</Link>
         </div>
       </div>
       <div className="footer-bottom"><span>© 2026 {name}. Tous droits réservés.</span><span>Mentions légales · Politique de confidentialité</span></div>
@@ -101,18 +88,9 @@ export function Footer() {
 
 export function PageHero({ eyebrow = 'GOSPEL BREAK CHAIN MINISTRY', title, text }) {
   const verse = useBibleVerse(6000);
-
   return (
     <section className="page-hero">
-      <div className="page-hero-content">
-        <p className="eyebrow">{eyebrow}</p>
-        <h1>{title}</h1>
-        {text && <p className="page-hero-text">{text}</p>}
-        <div className="hero-verse" key={verse.id}>
-          <p className="verse">« {verse.text} »</p>
-          <b>{verse.reference}</b>
-        </div>
-      </div>
+      <div className="page-hero-content"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1>{text && <p className="page-hero-text">{text}</p>}<div className="hero-verse" key={verse.id}><p className="verse">« {verse.text} »</p><b>{verse.reference}</b></div></div>
       <div className="hero-ornament" aria-hidden="true">✦</div>
     </section>
   );
@@ -123,5 +101,5 @@ export function SectionTitle({ eyebrow, title, text, action }) {
 }
 
 export function CTA({ children, to = '/contact', dark = false }) {
-  return <Link className={dark ? 'btn outline' : 'btn'} to={to}>{children} <span>→</span></Link>;
+  return <Link className={dark ? 'btn outline' : 'btn'} onClick={scrollToPageTop} to={to}>{children} <span>→</span></Link>;
 }
