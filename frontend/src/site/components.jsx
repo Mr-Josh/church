@@ -48,6 +48,7 @@ export function Header() {
               {label}
             </Link>
           ))}
+          <Link className={location.pathname === '/help' ? 'help-nav-btn active' : 'help-nav-btn'} onClick={() => { setOpen(false); scrollToPageTop(); }} to="/help">Besoin d’aide ?</Link>
           <Link className="donate-btn" onClick={() => { setOpen(false); scrollToPageTop(); }} to="/donate">Faire un don</Link>
         </nav>
       </header>
