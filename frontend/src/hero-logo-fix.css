@@ -38,12 +38,17 @@
 
 @media(max-width:780px){
   .brand img{width:78px!important;height:52px!important}
-  .hero-home,
-  .page-hero{
-    min-height:430px!important;
-    height:430px;
-    background-position:center,76% 48%!important;
-    background-size:cover,330px auto!important;
+  .hero-home {
+    min-height: 680px!important;
+    height: auto!important;
+    background-position: center,76% 48%!important;
+    background-size: cover,330px auto!important;
+  }
+  .page-hero {
+    min-height: 330px!important;
+    height: auto!important;
+    background-position: center,76% 48%!important;
+    background-size: cover,330px auto!important;
   }
   .hero-content{padding:60px 20px!important}
 }

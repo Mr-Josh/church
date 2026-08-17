@@ -397,6 +397,27 @@ Les fondations du site vitrine, des formulaires, de l'API et de l'espace d'admin
 
 Les éléments liés aux paiements/dons sont prévus mais restent séparés du périmètre d'intégration actuel.
 
+## Modifications de la branche `frontend-dev`
+
+### Section des piliers (`.pillars` / `.pillar-grid`)
+- **Séparation de la section Hero** : Suppression de la marge supérieure négative (`margin-top: -48px` et `margin-top: -30px`) sur la classe `.pillars`. La section des piliers est désormais complètement détachée et séparée de la section Hero, avec un espacement uniforme et esthétique de 80px sur desktop et 50px sur mobile/tablette.
+- **Centrage du contenu** : Centrage horizontal de la grille des piliers dans sa section. De plus, le contenu de chaque pilier individuel (icône, titre `h3` et description `p`) a été centré grâce à des règles flexbox (`display: flex; flex-direction: column; align-items: center; text-align: center;`) pour un rendu visuel équilibré et premium.
+- **Ajout d'un titre de section** : Intégration du composant `<SectionTitle>` avec le sur-titre (eyebrow) `"NOS PILIERS"` et le titre `"Les fondements de notre foi"` juste au-dessus de la grille des piliers pour structurer et introduire élégamment cette partie de la page d'accueil.
+
+### Barre de navigation (`fixed-navbar.css`)
+- **Correction de l'espace vide sous la navbar** : Ajustement du `padding-top` sur l'élément `main` (réduit à `84px` sur desktop et `68px` sur mobile au lieu de `122px` et `102px` respectively) suite à la mise en commentaire de la barre supérieure (`topbar`). Cela a permis de supprimer la zone vide indésirable qui flottait sous la barre de navigation fixe.
+
+### Section Hero (`hero-logo-fix.css` / `responsive.css`)
+- **Correction du débordement sur mobile** : Séparation des styles de `.hero-home` (page d'accueil) et `.page-hero` (pages internes) sous la règle mobile `max-width: 780px`. Auparavant, une hauteur contrainte de 430px (`min-height: 430px!important`) forçait le contenu de l'accueil (titre, verset biblique long et boutons CTA empilés) à déborder et à chevaucher la section des piliers. La page d'accueil utilise désormais `min-height: 680px!important` et `height: auto!important` sur mobile afin que la hauteur s'adapte dynamiquement et proprement au volume de contenu.
+
+### Suppression des bannières Hero sur les pages internes (`InteractionPages.jsx` / `ContentPages.jsx`)
+- **Retrait global de la bannière Hero** : Le composant `PageHero` (qui affichait un grand bandeau bleu foncé avec arrière-plan, image de marque et verset dynamique) a été retiré de l'ensemble des pages internes (À propos, Pasteur, Ministères, Programmes, Événements, Prédications, Galerie, Témoignages, Prière, Évangélisation, Aide, Contact, Dons).
+- **Remplacement par des titres épurés** : Chaque page interne affiche désormais à la place un titre sobre et élégant via le composant `<SectionTitle>` enveloppé dans un conteneur (`.container`) avec un décalage vertical (`padding-top: 50px`). Cela rend le site plus léger, plus moderne et recentre l'attention sur le contenu spécifique de chaque page, tout en conservant la bannière Hero exclusive sur la page d'accueil.
+
+### Défilement automatique vers le haut lors de la navigation (`AppEntry.jsx`)
+- **Problème corrigé** : En cliquant sur un lien dans le pied de page (footer), l'utilisateur était bien redirigé vers la bonne page mais restait positionné au bas de la page (là où il se trouvait avant de cliquer), ce qui donnait une expérience désagréable.
+- **Solution** : Ajout d'un composant `<ScrollToTop>` dans `AppEntry.jsx`. Ce composant écoute les changements de route via le hook `useLocation` de React Router et exécute `window.scrollTo(0, 0)` à chaque changement d'URL, forçant ainsi la page à revenir en haut à chaque navigation.
+
 ## Dépôt
 
 Repository : `Mr-Josh/church`

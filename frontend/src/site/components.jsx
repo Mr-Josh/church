@@ -38,12 +38,12 @@ export function Header() {
 
   return (
     <div className="site-header">
-      <div className="topbar">
+      {/*<div className="topbar">
         <div>
           ☎ {settings.phone} <span>•</span> <a href={whatsapp}>WhatsApp</a> <span>•</span> {settings.email}
         </div>
         <div>Suivez-nous : ◉ ◉ ◉</div>
-      </div>
+      </div>*/}
       <header className="header">
         <Link className="brand" to="/" aria-label={`Accueil ${settings.church_name || settings.name}`}>
           <img src="/logo.svg" alt={settings.church_name || settings.name} />

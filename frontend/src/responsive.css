@@ -41,7 +41,7 @@ button,a,input,textarea{touch-action:manipulation}
   .hero-home{min-height:610px}.hero-content{padding:72px 0 90px}.hero-content h1{font-size:clamp(37px,11vw,58px);line-height:1.01;margin:10px 0 20px}.hero-content .verse{font-size:14px;line-height:1.7}
   .hero-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:22px;max-width:390px}.hero-actions .btn{justify-content:center;width:100%;min-height:48px}.hero-home:after{font-size:150px;right:-5%;bottom:5%}
   .hero-brand{width:120px!important;max-width:120px!important;margin-bottom:12px!important}
-  .pillars{margin-top:-30px}.pillar-grid{grid-template-columns:1fr;border-radius:8px}.pillar{border-right:0;border-bottom:1px solid var(--line);padding:22px 20px}.pillar:last-child{border-bottom:0}.pillar h3{margin-top:13px}
+  .pillars{margin-top:50px}.pillar-grid{grid-template-columns:1fr;border-radius:8px}.pillar{border-right:0;border-bottom:1px solid var(--line);padding:22px 20px}.pillar:last-child{border-bottom:0}.pillar h3{margin-top:13px}
   .section{padding:58px 0}.section-title{display:block;margin-bottom:25px}.section-title h2{font-size:clamp(28px,8vw,36px);line-height:1.1;margin:7px 0 10px}.section-title p{font-size:13px;line-height:1.7}.section-title>.text-link,.section-title>a{display:inline-block;margin-top:15px}
   .two-cols,.pastor-layout,.timeline-cols,.contact-layout,.testimonials,.evangelism,.help-layout{grid-template-columns:1fr;gap:28px}.schedule-card{padding:18px}.schedule-row{display:grid;grid-template-columns:1fr;gap:5px;padding:14px 0}
   .event-grid,.event-grid.big,.ministry-grid,.sermon-grid,.three-cards{grid-template-columns:1fr}.event-card{padding:19px;gap:14px}.event-card h3{font-size:18px}.pastor-highlight{grid-template-columns:1fr;gap:28px}.pastor-placeholder,.pastor-photo{min-height:340px}.dark-section blockquote{font-size:25px;line-height:1.4}
@@ -68,7 +68,7 @@ button,a,input,textarea{touch-action:manipulation}
   .hero-home{min-height:680px;overflow:hidden}
   .hero-content{padding-bottom:120px}
   .hero-actions{position:relative;z-index:6}
-  .pillars{margin-top:0;z-index:5}
+  .pillars{margin-top:50px;z-index:5}
 }
 
 @media (max-width:480px){

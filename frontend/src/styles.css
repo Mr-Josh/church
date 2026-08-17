@@ -221,7 +221,7 @@ textarea {
 }
 .pillars {
   position: relative;
-  margin-top: -48px;
+  margin: 80px auto;
   z-index: 5;
 }
 .pillar-grid {
@@ -235,6 +235,10 @@ textarea {
 .pillar {
   padding: 28px 25px;
   border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 .pillar:last-child {
   border: 0;
