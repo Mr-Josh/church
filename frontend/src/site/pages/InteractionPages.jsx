@@ -38,9 +38,7 @@ export function Testimonials() {
 }
 
 function AssistancePrompt({ whatsappUrl, onClose }) {
-  const openWhatsApp = () => {
-    window.location.href = whatsappUrl;
-  };
+  const openWhatsApp = () => { window.location.href = whatsappUrl; };
   return <div className="assistance-modal-backdrop" role="presentation">
     <div className="assistance-modal" role="dialog" aria-modal="true" aria-labelledby="assistance-title">
       <button className="assistance-modal-close" type="button" onClick={onClose} aria-label="Fermer">×</button>
@@ -68,7 +66,7 @@ function RequestForm({ kind }) {
       else await churchApi.submitHelpRequest(form);
       setSent(true);
       setForm(emptyRequest);
-      if (isPrayer) setShowAssistance(true);
+      setShowAssistance(true);
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -84,7 +82,7 @@ function RequestForm({ kind }) {
       {error && <p className="form-error" role="alert">{error}</p>}{sent && !showAssistance && <p className="form-success" role="status">{isPrayer ? 'Votre demande de prière a bien été reçue.' : 'Votre demande d’assistance a bien été reçue.'}</p>}
       <button className="btn" type="submit" disabled={loading}>{loading ? 'Envoi en cours…' : sent ? 'Envoyer une nouvelle demande' : 'Envoyer ma demande'} <span>→</span></button>
     </form>
-    {showAssistance && isPrayer && <AssistancePrompt whatsappUrl={whatsappUrl} onClose={() => setShowAssistance(false)} />}
+    {showAssistance && <AssistancePrompt whatsappUrl={whatsappUrl} onClose={() => setShowAssistance(false)} />}
   </>;
 }
 
