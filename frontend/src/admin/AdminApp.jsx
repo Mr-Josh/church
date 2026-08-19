@@ -24,8 +24,6 @@ export default function AdminApp() {
           <Route path="/admin/ministries" element={<AdminResourcePage resource="ministries" />} />
           <Route path="/admin/programs" element={<AdminResourcePage resource="programs" />} />
           <Route path="/admin/events" element={<AdminResourcePage resource="events" />} />
-          <Route path="/admin/sermons" element={<AdminResourcePage resource="sermons" />} />
-          <Route path="/admin/gallery" element={<AdminResourcePage resource="gallery" />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
         </Route>
