@@ -25,12 +25,10 @@ export const sermons = [
 
 export const navigation = [
   ['/', 'Accueil'],
-  ['/about', 'À propos'],
-  ['/pastor', 'Le pasteur'],
-  ['/ministries', 'Ministères'],
+  ['#a-propos', 'À propos'],
+  ['#pasteur', 'Le pasteur'],
+  ['#ministeres', 'Ministères'],
   ['/programs', 'Programmes'],
   ['/events', 'Événements'],
-  ['/sermons', 'Prédications'],
-  ['/gallery', 'Galerie'],
-  ['/contact', 'Contact'],
+  ['#contact', 'Contact'],
 ];
