@@ -1,0 +1,16 @@
+/* Fixed navbar compensation for in-page anchor navigation. */
+#a-propos,
+#pasteur,
+#ministeres,
+#contact {
+  scroll-margin-top: 96px;
+}
+
+@media (max-width: 780px) {
+  #a-propos,
+  #pasteur,
+  #ministeres,
+  #contact {
+    scroll-margin-top: 88px;
+  }
+}
