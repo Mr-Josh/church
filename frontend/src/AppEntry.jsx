@@ -4,6 +4,7 @@ import './styles.css';
 import './responsive.css';
 import './hero-logo-fix.css';
 import './hero-layout.css';
+import './public-layout.css';
 import AdminApp from './admin/AdminApp';
 import DevApp from './dev/DevApp';
 import PublicApp from './site/PublicApp';
