@@ -30,6 +30,20 @@ function scrollToPageTop() {
   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 }
 
+function handleNavigationClick(to, setOpen) {
+  setOpen(false);
+  if (to.startsWith('#')) {
+    if (window.location.pathname !== '/') {
+      window.location.href = `/${to}`;
+      return;
+    }
+    const target = document.querySelector(to);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  scrollToPageTop();
+}
+
 export function Header() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
@@ -44,7 +58,7 @@ export function Header() {
         <button className="menu-toggle" onClick={() => setOpen((value) => !value)} aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={open}>☰</button>
         <nav className={open ? 'nav open' : 'nav'} aria-label="Navigation principale">
           {navigation.map(([to, label]) => (
-            <Link key={to} className={location.pathname === to ? 'active' : ''} onClick={() => { setOpen(false); scrollToPageTop(); }} to={to}>
+            <Link key={to} className={to.startsWith('#') && location.pathname === '/' ? 'anchor-nav-link' : location.pathname === to ? 'active' : ''} onClick={(event) => { if (to.startsWith('#')) event.preventDefault(); handleNavigationClick(to, setOpen); }} to={to.startsWith('#') ? `/${to}` : to}>
               {label}
             </Link>
           ))}
@@ -60,7 +74,14 @@ export function Footer() {
   const settings = useChurchSettings();
   const whatsapp = settings.whatsapp ? `https://wa.me/${String(settings.whatsapp).replace(/\D/g, '')}` : WHATSAPP_URL;
   const name = settings.church_name || settings.name || church.name;
-  const footerLinkProps = { onClick: scrollToPageTop };
+
+  const goHomeSection = (id) => {
+    if (window.location.pathname !== '/') {
+      window.location.href = `/#${id}`;
+      return;
+    }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <footer className="footer">
@@ -71,15 +92,18 @@ export function Footer() {
         </div>
         <div className="footer-group">
           <h4>Liens rapides</h4>
-          <Link {...footerLinkProps} to="/about">À propos</Link><Link {...footerLinkProps} to="/ministries">Ministères</Link><Link {...footerLinkProps} to="/events">Événements</Link><Link {...footerLinkProps} to="/contact">Contact</Link>
+          <button type="button" className="footer-anchor-link" onClick={() => goHomeSection('a-propos')}>À propos</button>
+          <button type="button" className="footer-anchor-link" onClick={() => goHomeSection('ministeres')}>Ministères</button>
+          <Link to="/events" onClick={scrollToPageTop}>Événements</Link>
+          <button type="button" className="footer-anchor-link" onClick={() => goHomeSection('contact')}>Contact</button>
         </div>
         <div className="footer-group">
           <h4>Nos services</h4>
-          <Link {...footerLinkProps} to="/prayer">Demande de prière</Link><Link {...footerLinkProps} to="/donate">Faire un don</Link><Link {...footerLinkProps} to="/sermons">Prédications</Link><Link {...footerLinkProps} to="/testimonials">Témoignages</Link><Link {...footerLinkProps} to="/help">Assistance</Link>
+          <Link to="/prayer" onClick={scrollToPageTop}>Demande de prière</Link><Link to="/donate" onClick={scrollToPageTop}>Faire un don</Link><Link to="/testimonials" onClick={scrollToPageTop}>Témoignages</Link><Link to="/help" onClick={scrollToPageTop}>Assistance</Link>
         </div>
         <div className="footer-group footer-contact-group">
           <h4>Contactez-nous</h4>
-          <span>{settings.address}</span><span>{settings.phone}</span><span>{settings.email}</span><a href={whatsapp}>WhatsApp</a><Link className="footer-pastor-link" {...footerLinkProps} to="/admin">Espace Pasteur →</Link>
+          <span>{settings.address}</span><span>{settings.phone}</span><span>{settings.email}</span><a href={whatsapp}>WhatsApp</a><Link className="footer-pastor-link" onClick={scrollToPageTop} to="/admin">Espace Pasteur →</Link>
         </div>
       </div>
       <div className="footer-bottom"><span>© 2026 {name}. Tous droits réservés.</span><span>Mentions légales · Politique de confidentialité</span></div>
@@ -90,10 +114,7 @@ export function Footer() {
 export function PageHero({ eyebrow = 'GOSPEL BREAK CHAIN MINISTRY', title, text }) {
   const verse = useBibleVerse(6000);
   return (
-    <section className="page-hero">
-      <div className="page-hero-content"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1>{text && <p className="page-hero-text">{text}</p>}<div className="hero-verse" key={verse.id}><p className="verse">« {verse.text} »</p><b>{verse.reference}</b></div></div>
-      <div className="hero-ornament" aria-hidden="true">✦</div>
-    </section>
+    <section className="page-hero"><div className="page-hero-content"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1>{text && <p className="page-hero-text">{text}</p>}<div className="hero-verse" key={verse.id}><p className="verse">« {verse.text} »</p><b>{verse.reference}</b></div></div><div className="hero-ornament" aria-hidden="true">✦</div></section>
   );
 }
 
