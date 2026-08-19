@@ -7,6 +7,7 @@ import { useBibleVerse } from '../useBibleVerse';
 import './footer.css';
 import './hero.css';
 import './fixed-navbar.css';
+import './anchor-sections.css';
 
 function normalizeChurchSettings(payload) {
   const value = payload?.data;
@@ -37,8 +38,7 @@ function handleNavigationClick(to, setOpen) {
       window.location.href = `/${to}`;
       return;
     }
-    const target = document.querySelector(to);
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelector(to)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
   scrollToPageTop();
@@ -86,25 +86,10 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="footer-main">
-        <div className="footer-brand-group">
-          <img src="/logo.svg" className="footer-logo" alt={name} />
-          <p>Nous existons pour glorifier Dieu, édifier les saints et impacter notre génération par l’Évangile.</p>
-        </div>
-        <div className="footer-group">
-          <h4>Liens rapides</h4>
-          <button type="button" className="footer-anchor-link" onClick={() => goHomeSection('a-propos')}>À propos</button>
-          <button type="button" className="footer-anchor-link" onClick={() => goHomeSection('ministeres')}>Ministères</button>
-          <Link to="/events" onClick={scrollToPageTop}>Événements</Link>
-          <button type="button" className="footer-anchor-link" onClick={() => goHomeSection('contact')}>Contact</button>
-        </div>
-        <div className="footer-group">
-          <h4>Nos services</h4>
-          <Link to="/prayer" onClick={scrollToPageTop}>Demande de prière</Link><Link to="/donate" onClick={scrollToPageTop}>Faire un don</Link><Link to="/testimonials" onClick={scrollToPageTop}>Témoignages</Link><Link to="/help" onClick={scrollToPageTop}>Assistance</Link>
-        </div>
-        <div className="footer-group footer-contact-group">
-          <h4>Contactez-nous</h4>
-          <span>{settings.address}</span><span>{settings.phone}</span><span>{settings.email}</span><a href={whatsapp}>WhatsApp</a><Link className="footer-pastor-link" onClick={scrollToPageTop} to="/admin">Espace Pasteur →</Link>
-        </div>
+        <div className="footer-brand-group"><img src="/logo.svg" className="footer-logo" alt={name} /><p>Nous existons pour glorifier Dieu, édifier les saints et impacter notre génération par l’Évangile.</p></div>
+        <div className="footer-group"><h4>Liens rapides</h4><button type="button" className="footer-anchor-link" onClick={() => goHomeSection('a-propos')}>À propos</button><button type="button" className="footer-anchor-link" onClick={() => goHomeSection('ministeres')}>Ministères</button><Link to="/events" onClick={scrollToPageTop}>Événements</Link><button type="button" className="footer-anchor-link" onClick={() => goHomeSection('contact')}>Contact</button></div>
+        <div className="footer-group"><h4>Nos services</h4><Link to="/prayer" onClick={scrollToPageTop}>Demande de prière</Link><Link to="/donate" onClick={scrollToPageTop}>Faire un don</Link><Link to="/testimonials" onClick={scrollToPageTop}>Témoignages</Link><Link to="/help" onClick={scrollToPageTop}>Assistance</Link></div>
+        <div className="footer-group footer-contact-group"><h4>Contactez-nous</h4><span>{settings.address}</span><span>{settings.phone}</span><span>{settings.email}</span><a href={whatsapp}>WhatsApp</a><Link className="footer-pastor-link" onClick={scrollToPageTop} to="/admin">Espace Pasteur →</Link></div>
       </div>
       <div className="footer-bottom"><span>© 2026 {name}. Tous droits réservés.</span><span>Mentions légales · Politique de confidentialité</span></div>
     </footer>
@@ -113,9 +98,7 @@ export function Footer() {
 
 export function PageHero({ eyebrow = 'GOSPEL BREAK CHAIN MINISTRY', title, text }) {
   const verse = useBibleVerse(6000);
-  return (
-    <section className="page-hero"><div className="page-hero-content"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1>{text && <p className="page-hero-text">{text}</p>}<div className="hero-verse" key={verse.id}><p className="verse">« {verse.text} »</p><b>{verse.reference}</b></div></div><div className="hero-ornament" aria-hidden="true">✦</div></section>
-  );
+  return <section className="page-hero"><div className="page-hero-content"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1>{text && <p className="page-hero-text">{text}</p>}<div className="hero-verse" key={verse.id}><p className="verse">« {verse.text} »</p><b>{verse.reference}</b></div></div><div className="hero-ornament" aria-hidden="true">✦</div></section>;
 }
 
 export function SectionTitle({ eyebrow, title, text, action }) {
