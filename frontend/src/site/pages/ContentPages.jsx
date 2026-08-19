@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CTA, PageHero, SectionTitle } from '../components';
+import { CTA, SectionTitle } from '../components';
 import { churchApi } from '../../services/churchApi';
 import { useBibleVerse } from '../../useBibleVerse';
 
@@ -48,16 +48,13 @@ export function Home() {
   const events = useRemote(churchApi.events);
   const testimonials = useRemote(churchApi.testimonials);
   const verse = useBibleVerse(6000);
-
   const pastorName = settings.pastor_name || 'Jean Emmanuel';
   const whatsapp = settings.whatsapp ? `https://wa.me/${String(settings.whatsapp).replace(/\D/g, '')}` : '';
 
   return <>
     <section className="hero-home"><div className="container hero-content"><p className="eyebrow">{settings.church_name || 'GOSPEL BREAK CHAIN MINISTRY'}</p><h1>{(settings.slogan || 'PAR LE POUVOIR DE CHRIST').toUpperCase()}</h1><div className="hero-verse" key={verse.id}><p className="verse">« {verse.text} »</p><b>{verse.reference}</b></div><div className="hero-actions"><CTA to="/programs">Nous rejoindre</CTA><CTA dark to="/prayer">Faire une demande de prière</CTA></div></div></section>
 
-    <section className="pillars"><div className="container pillar-grid">{[['ADORER DIEU','Célébrer Sa présence et Sa grandeur.','♬'],['ÉDIFIER LES ÂMES','Former des disciples matures en Christ.','♡'],['ÉVANGÉLISER LE MONDE','Partager l’Évangile avec puissance.','◎'],['IMPACTER LA SOCIÉTÉ','Être une lumière dans notre génération.','✦']].map((item) => <div className="pillar" key={item[0]}><i>{item[2]}</i><h3>{item[0]}</h3><p>{item[1]}</p></div>)}</div></section>
-
-    <section className="section soft" id="a-propos"><div className="container two-cols"><div><SectionTitle eyebrow="À PROPOS" title="Une foi qui transforme" text={settings.mission || 'Mission non renseignée.'} /><p>{settings.vision || 'Vision non renseignée.'}</p></div><div className="schedule-card"><h3>NOS HORAIRES DE CULTE</h3>{programs.length === 0 ? <p>Aucun programme publié.</p> : programs.map((program) => <div className="schedule-row" key={program.id}><b>{program.title}</b><span>{program.day || ''}{program.start_time ? ` · ${formatTime(program.start_time)}` : ''}{program.end_time ? ` – ${formatTime(program.end_time)}` : ''}</span></div>)}</div></div></section>
+    <section className="section soft" id="a-propos"><div className="container about-home"><div><SectionTitle eyebrow="À PROPOS" title="Une foi qui transforme" text={settings.mission || 'Mission non renseignée.'} /><p>{settings.vision || 'Vision non renseignée.'}</p></div><div className="schedule-card"><h3>NOS HORAIRES DE CULTE</h3>{programs.length === 0 ? <p>Aucun programme publié.</p> : programs.map((program) => <div className="schedule-row" key={program.id}><b>{program.title}</b><span>{program.day || ''}{program.start_time ? ` · ${formatTime(program.start_time)}` : ''}{program.end_time ? ` – ${formatTime(program.end_time)}` : ''}</span></div>)}</div></div></section>
 
     <section className="section"><div className="container"><SectionTitle eyebrow="PROCHAINS ÉVÉNEMENTS" title="Vivons ensemble les temps forts" action={<Link to="/events" className="text-link">Voir tous →</Link>} /><div className="event-grid">{events.length === 0 ? <p>Aucun événement publié.</p> : events.slice(0, 3).map((event) => { const date = formatEventDate(event.event_date); return <article className="event-card" key={event.id}><div className="date"><b>{date.day}</b><span>{date.month}</span></div><div><span className="tag">ÉVÉNEMENT</span><h3>{event.title}</h3><p>{event.description || `${date.time}${event.location ? ` · ${event.location}` : ''}`}</p></div></article>; })}</div></div></section>
 
@@ -73,12 +70,8 @@ export function Home() {
   </>;
 }
 
-export function About() {
-  const settings = useChurchSettings();
-  return <><PageHero title="À PROPOS DE NOUS" text="Découvrez notre histoire, notre vision, notre mission et les valeurs qui nous guident." /><section className="section"><div className="container three-cards"><article><span>◫</span><h2>NOTRE ÉGLISE</h2><p>{settings.church_name || 'Notre église'}</p></article><article><span>◎</span><h2>NOTRE VISION</h2><p>{settings.vision || 'Vision non renseignée.'}</p></article><article><span>✦</span><h2>NOTRE MISSION</h2><p>{settings.mission || 'Mission non renseignée.'}</p></article></div></section></>;
-}
-
-function CollectionPage({ loader, title, text, render }) { const data = useRemote(loader); return <><PageHero title={title} text={text} /><section className="section"><div className="container">{render(data)}</div></section></>; }
-
+export function About() { return null; }
 export function Programs() { return <CollectionPage loader={churchApi.programs} title="NOS PROGRAMMES" text="Retrouvez les rendez-vous réguliers de la communauté." render={(data) => data.length === 0 ? <p>Aucun programme publié.</p> : <div className="schedule-list">{data.map((program) => <article key={program.id}><div className="program-icon">◷</div><div><span className="gold-label">{program.day || ''}</span><h2>{program.title}</h2><p>{program.description}</p></div><strong>{formatTime(program.start_time)}{program.end_time ? ` – ${formatTime(program.end_time)}` : ''}</strong></article>)}</div>} />; }
 export function Events() { return <CollectionPage loader={churchApi.events} title="ÉVÉNEMENTS" text="Les prochains temps forts de Gospel Break Chain Ministry." render={(data) => data.length === 0 ? <p>Aucun événement publié.</p> : <div className="event-grid big">{data.map((event, index) => { const date = formatEventDate(event.event_date); return <article className="event-feature" key={event.id}><div className="event-image">{event.image ? <img src={event.image} alt={event.title} /> : <span>{String(index + 1).padStart(2, '0')}</span>}</div><div className="event-body"><span className="tag">À VENIR</span><h2>{event.title}</h2><p>{event.description}</p><b>{date.time}{event.location ? ` · ${event.location}` : ''}</b></div></article>; })}</div>} />; }
+
+function CollectionPage({ loader, title, text, render }) { const data = useRemote(loader); return <><section className="section page-title-simple"><div className="container"><SectionTitle eyebrow="GOSPEL BREAK CHAIN MINISTRY" title={title} text={text} /></div></section><section className="section"><div className="container">{render(data)}</div></section></>; }
