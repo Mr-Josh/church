@@ -27,6 +27,10 @@ export const churchApi = {
   submitPrayerRequest: (data) => request('/prayer-requests', { method: 'POST', body: JSON.stringify(data) }),
   submitHelpRequest: (data) => request('/help-requests', { method: 'POST', body: JSON.stringify(data) }),
   submitTestimonial: (data) => request('/testimonials', { method: 'POST', body: JSON.stringify(data) }),
+  submitDonation: (data) => request('/donations', { method: 'POST', body: JSON.stringify(data) }),
+  initiateDonation: (data) => request('/donations/initiate', { method: 'POST', body: JSON.stringify(data) }),
+  getDonationStatus: (ref) => request(`/donations/status?ref=${encodeURIComponent(ref)}`),
+  confirmDonation: (id, data = {}) => request(`/donations/confirm/${id}`, { method: 'POST', body: JSON.stringify(data) }),
   login: (data) => request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
   logout: () => request('/auth/logout', { method: 'POST' }),
   dev: {

@@ -28,7 +28,7 @@ export const navigation = [
   ['#a-propos', 'À propos'],
   ['#pasteur', 'Le pasteur'],
   ['#ministeres', 'Ministères'],
-  ['/programs', 'Programmes'],
-  ['/events', 'Événements'],
+  // ['/programs', 'Programmes'],  // désactivé temporairement
+  // ['/events', 'Événements'],    // désactivé temporairement
   ['#contact', 'Contact'],
 ];

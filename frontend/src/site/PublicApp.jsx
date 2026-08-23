@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { Footer, Header } from './components';
-import { Home, About, Programs, Events } from './pages/ContentPages';
+import { Home, About /*, Programs, Events*/ } from './pages/ContentPages';
 import { Testimonials, Prayer, Evangelism, Help, Donate } from './pages/InteractionPages';
 
 function ScrollToTop() {
@@ -23,8 +23,8 @@ export default function PublicApp() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
-          <Route path="/programs" element={<Programs />} />
-          <Route path="/events" element={<Events />} />
+          {/* <Route path="/programs" element={<Programs />} /> */}
+          {/* <Route path="/events" element={<Events />} /> */}
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/prayer" element={<Prayer />} />
           <Route path="/evangelism" element={<Evangelism />} />

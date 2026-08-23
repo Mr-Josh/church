@@ -1,3 +1,19 @@
-.sidebar-verse{overflow:hidden;animation:sidebar-verse-slide-in .55s cubic-bezier(.22,.61,.36,1) both}
-@keyframes sidebar-verse-slide-in{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
-@media(prefers-reduced-motion:reduce){.sidebar-verse{animation:none}}
+.sidebar-verse {
+  overflow: hidden;
+  animation: sidebar-verse-slide-in 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@keyframes sidebar-verse-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-verse {
+    animation: none;
+  }
+}

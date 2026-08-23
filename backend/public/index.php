@@ -11,11 +11,10 @@ require __DIR__ . '/../src/admin.php';
 require __DIR__ . '/../src/admin_crud.php';
 require __DIR__ . '/../src/dev.php';
 
-$corsOrigin = $config['cors_origin'] ?? null;
-if (!$corsOrigin) $corsOrigin = 'http://localhost:5173';
-header('Access-Control-Allow-Origin: ' . $corsOrigin);
+$origin = $_SERVER['HTTP_ORIGIN'] ?? ($config['cors_origin'] ?? 'http://localhost:5174');
+header('Access-Control-Allow-Origin: ' . $origin);
 header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
@@ -102,4 +101,194 @@ if ($path === '/api/testimonials' && $method === 'POST') {
     $stmt->execute([$data['name'], $data['content'], $data['photo'] ?? null]); jsonResponse(['message' => 'Testimonial submitted for review.'], 201);
 }
 
+if ($path === '/api/donations' && $method === 'POST') {
+    $data = requestBody();
+    if (empty($data['phone']) || empty($data['amount']) || empty($data['type']) || empty($data['payment_method'])) {
+        jsonResponse(['message' => 'Téléphone, montant, type et moyen de paiement sont requis.'], 422);
+    }
+    $reference = 'DON-' . strtoupper(bin2hex(random_bytes(6)));
+    $stmt = $db->prepare('INSERT INTO donations (reference, name, phone, amount, type, payment_method, status) VALUES (?, ?, ?, ?, ?, ?, ?)');
+    $stmt->execute([
+        $reference,
+        !empty($data['name']) ? $data['name'] : null,
+        $data['phone'],
+        $data['amount'],
+        $data['type'],
+        $data['payment_method'],
+        'pending'
+    ]);
+    jsonResponse([
+        'message' => 'Donation initiated.',
+        'data' => [
+            'id' => (int)$db->lastInsertId(),
+            'reference' => $reference,
+            'status' => 'pending'
+        ]
+    ], 201);
+}
+
+if (preg_match('#^/api/donations/confirm/(\d+)$#', $path, $match) && $method === 'POST') {
+    $id = (int)$match[1];
+    $data = requestBody();
+    $transactionId = !empty($data['transaction_id']) ? $data['transaction_id'] : 'TXN-' . strtoupper(bin2hex(random_bytes(8)));
+    $status = !empty($data['status']) ? $data['status'] : 'success';
+    
+    $stmt = $db->prepare('UPDATE donations SET status = ?, transaction_id = ? WHERE id = ?');
+    $stmt->execute([$status, $transactionId, $id]);
+    jsonResponse([
+        'message' => 'Donation status updated.',
+        'status' => $status,
+        'transaction_id' => $transactionId
+    ]);
+}
+
+if ($path === '/api/donations/initiate' && $method === 'POST') {
+    $pay = require __DIR__ . '/../config/payment.php';
+    $data = requestBody();
+
+    // Validate required fields
+    if (empty($data['phone']) || empty($data['amount'])) {
+        jsonResponse(['message' => 'Le numéro de téléphone et le montant sont requis.'], 422);
+    }
+    $amount  = (float) $data['amount'];
+    $phone   = (string) $data['phone'];
+    $name    = !empty($data['name']) ? (string) $data['name'] : 'Donateur anonyme';
+
+    if ($amount <= 0) {
+        jsonResponse(['message' => 'Le montant doit être supérieur à 0.'], 422);
+    }
+
+    // 1. Record the pending donation in our database first
+    $reference = 'DON-' . strtoupper(bin2hex(random_bytes(6)));
+    $stmt = $db->prepare(
+        'INSERT INTO donations (reference, name, phone, amount, type, payment_method, status) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    );
+    $stmt->execute([
+        $reference,
+        $name,
+        $phone,
+        $amount,
+        'Don',
+        'Genius Pay',
+        'pending'
+    ]);
+    $donationId = (int) $db->lastInsertId();
+
+    // 2. Call Genius Pay API to create a checkout session
+    $appUrl     = $config['app_url'] ?? 'http://localhost:8000';
+    $frontUrl   = getenv('FRONTEND_URL') ?: 'http://localhost:5174';
+    $payload    = json_encode([
+        'amount'        => (int) round($amount),
+        'currency'      => $pay['currency'],
+        'description'   => 'Donation – ' . $name,
+        'customer_name' => $name,
+        'customer_phone'=> $phone,
+        'reference'     => $reference,
+        'success_url'   => $frontUrl . '/donate?status=success&ref=' . urlencode($reference),
+        'error_url'     => $frontUrl . '/donate?status=cancelled',
+        'webhook_url'   => $appUrl  . '/api/donations/webhook',
+    ]);
+
+    $endpoint = $pay['base_url'];
+
+    $ch = curl_init($endpoint);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'Accept: application/json',
+            'Authorization: Bearer ' . $pay['api_key'],
+        ],
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => 0,
+    ]);
+    $raw      = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr  = curl_error($ch);
+    curl_close($ch);
+
+    $result = $raw !== false ? json_decode($raw, true) : null;
+    $checkoutUrl = $result['data']['checkout_url']
+      ?? $result['data']['payment_url'] 
+      ?? $result['data']['redirect_url'] 
+      ?? $result['data']['url'] 
+      ?? $result['checkout_url']
+      ?? $result['payment_url'] 
+      ?? $result['redirect_url'] 
+      ?? $result['url'] 
+      ?? null;
+
+    // Local simulation fallback if using placeholder keys (pk_sandbox_xxxxxxxx)
+    if (str_contains($pay['api_key'], 'xxxxxxxx')) {
+        $stmt = $db->prepare('UPDATE donations SET status = ?, transaction_id = ? WHERE id = ?');
+        $stmt->execute(['success', 'TXN-GENIUS-SIM-' . strtoupper(bin2hex(random_bytes(4))), $donationId]);
+
+        jsonResponse([
+            'donation_id'   => $donationId,
+            'reference'     => $reference,
+            'checkout_url'  => $frontUrl . '/donate?status=success&ref=' . urlencode($reference),
+            'is_simulation' => true,
+        ], 201);
+    }
+
+    if ($curlErr) {
+        jsonResponse(['message' => 'Erreur de connexion cURL : ' . $curlErr], 502);
+    }
+
+    if (!$checkoutUrl || $httpCode >= 400) {
+        $msg = $result['message'] ?? $result['error'] ?? $result['detail'] ?? (is_string($raw) ? $raw : null) ?? 'Erreur API Genius Pay (Code ' . $httpCode . ')';
+        if (is_array($msg)) $msg = json_encode($msg);
+        jsonResponse(['message' => 'Genius Pay : ' . $msg], 502);
+    }
+
+    // Save the Genius Pay transaction reference if provided
+    if (!empty($result['transaction_id'])) {
+        $stmt = $db->prepare('UPDATE donations SET transaction_id = ? WHERE id = ?');
+        $stmt->execute([$result['transaction_id'], $donationId]);
+    }
+
+    jsonResponse([
+        'donation_id'   => $donationId,
+        'reference'     => $reference,
+        'checkout_url'  => $checkoutUrl,
+    ], 201);
+}
+
+if ($path === '/api/donations/webhook' && $method === 'POST') {
+    $data = requestBody();
+    
+    // Extract transaction details sent back by Genius Pay
+    $ref       = $data['reference'] ?? $data['external_reference'] ?? $data['data']['reference'] ?? null;
+    $status    = $data['status'] ?? $data['data']['status'] ?? 'success';
+    $txnId     = $data['transaction_id'] ?? $data['id'] ?? $data['data']['id'] ?? null;
+    $payMethod = $data['gateway'] ?? $data['payment_method'] ?? $data['data']['gateway'] ?? 'Genius Pay';
+
+    if ($ref) {
+        $isSuccess = in_array(strtolower((string)$status), ['success', 'completed', 'paid', 'successful'], true);
+        $dbStatus  = $isSuccess ? 'success' : 'failed';
+
+        $stmt = $db->prepare('UPDATE donations SET status = ?, transaction_id = ?, payment_method = ? WHERE reference = ?');
+        $stmt->execute([$dbStatus, $txnId, $payMethod, $ref]);
+    }
+
+    jsonResponse(['status' => 'ok', 'message' => 'Webhook reçu avec succès.']);
+}
+
+if ($path === '/api/donations/status' && $method === 'GET') {
+    $ref = $_GET['ref'] ?? null;
+    if (!$ref) jsonResponse(['message' => 'Référence requise.'], 422);
+
+    $stmt = $db->prepare('SELECT reference, name, phone, amount, payment_method, status, created_at FROM donations WHERE reference = ? LIMIT 1');
+    $stmt->execute([$ref]);
+    $donation = $stmt->fetch();
+    if (!$donation) jsonResponse(['message' => 'Don introuvable.'], 404);
+
+    jsonResponse(['data' => $donation]);
+}
+
 jsonResponse(['message' => 'Route not found.'], 404);
+
+

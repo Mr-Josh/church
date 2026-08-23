@@ -29,6 +29,7 @@ function adminCrudRoute(PDO $db, string $path, string $method): void
         'testimonials' => 'testimonials',
         'prayer-requests' => 'prayer_requests',
         'help-requests' => 'help_requests',
+        'donations' => 'donations',
     ];
 
     foreach ($resources as $resource => $table) {
@@ -268,6 +269,7 @@ function updateAdminResource(PDO $db, string $resource, int $id, array $data): n
         'testimonials' => ['name','content','photo','status'],
         'prayer-requests' => ['name','phone','email','subject','message','is_confidential','is_urgent','status'],
         'help-requests' => ['name','phone','message','status'],
+        'donations' => ['name','phone','amount','type','payment_method','transaction_id','status'],
     ];
 
     $fields = $definitions[$resource] ?? [];

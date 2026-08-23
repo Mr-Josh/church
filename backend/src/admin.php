@@ -15,6 +15,7 @@ function adminDashboard(PDO $db): void
         'testimonials' => 'testimonials',
         'prayer-requests' => 'prayer_requests',
         'help-requests' => 'help_requests',
+        'donations' => 'donations',
     ];
 
     $counts = [];
@@ -22,5 +23,10 @@ function adminDashboard(PDO $db): void
         $counts[$key] = (int) $db->query("SELECT COUNT(*) FROM {$table}")->fetchColumn();
     }
 
-    jsonResponse(['data' => ['counts' => $counts]]);
+    $donationsSum = (float) $db->query("SELECT COALESCE(SUM(amount), 0) FROM donations WHERE status = 'success'")->fetchColumn();
+
+    jsonResponse(['data' => [
+        'counts' => $counts,
+        'donations_sum' => $donationsSum
+    ]]);
 }
