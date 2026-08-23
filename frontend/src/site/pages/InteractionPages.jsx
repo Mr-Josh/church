@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PageHero, SectionTitle } from "../components";
 import { TestimonialCarousel } from "../TestimonialCarousel";
-import { churchApi } from "../../services/churchApi";
+import { churchApi } from '../../services/churchApi';
 import { WHATSAPP_URL } from "../config";
 
 const emptyRequest = {

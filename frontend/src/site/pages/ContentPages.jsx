@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { CTA, SectionTitle } from "../components";
-import { churchApi } from "../../services/churchApi";
+import { churchApi } from '../../services/churchApi';
 import { useBibleVerse } from "../../useBibleVerse";
 import { church } from "../config";
 
