@@ -5,6 +5,7 @@ import MinistryHome from './MinistryHome';
 import PrayerPage from './PrayerPage';
 import { Programs, Events } from './pages/ContentPages';
 import { Testimonials, Evangelism, Help, Donate } from './pages/InteractionPages';
+import { useScrollReveal } from './useScrollReveal';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -12,8 +13,13 @@ function ScrollToTop() {
   return null;
 }
 
+function MotionObserver() {
+  useScrollReveal();
+  return null;
+}
+
 export default function PublicApp() {
-  return <div className="public-site"><ScrollToTop /><Header /><main><Routes>
+  return <div className="public-site"><ScrollToTop /><MotionObserver /><Header /><main><Routes>
     <Route path="/" element={<MinistryHome />} />
     <Route path="/programs" element={<Programs />} />
     <Route path="/events" element={<Events />} />
