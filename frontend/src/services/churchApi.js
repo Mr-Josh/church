@@ -26,7 +26,6 @@ export const churchApi = {
   health: () => request('/health'),
   church: requestChurchSettings,
   ministries: () => request('/ministries'),
-  programs: () => request('/programs'),
   events: () => request('/events'),
   testimonials: () => request('/testimonials'),
   submitPrayerRequest: (data) => request('/prayer-requests', { method: 'POST', body: JSON.stringify(data) }),
