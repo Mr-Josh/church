@@ -1,36 +1,43 @@
 USE church;
 
-INSERT INTO church_settings (id, church_name, slogan, mission, vision, address, phone, whatsapp, email)
-VALUES (1, 'Gospel Break Chain Ministry', 'Brisons les chaînes par le pouvoir de Christ.', 'Gagner les âmes, faire des disciples, impacter notre génération par la parole de Dieu et l\'amour du Christ.', 'Être une église passionnée par la présence de Dieu et la transformation des nations.', 'Quartier Bonamoussadi, Rue 12, Douala, Cameroun', '+237 600 000 000', '+237 600 000 000', 'contact@gospelbreakchainministry.org')
-ON DUPLICATE KEY UPDATE church_name = VALUES(church_name);
+INSERT INTO church_settings (id, church_name, slogan, mission, vision, address, phone, whatsapp, email, pastor_name, pastor_title, pastor_bio)
+VALUES (
+  1,
+  'Gospel Break Chain Ministry',
+  'Brisons les chaînes par le pouvoir de Christ',
+  'Porter l’Évangile du Seigneur Jésus-Christ partout où le besoin se fait sentir.',
+  'Restaurer, libérer et impacter.',
+  'Mora, Extrême-Nord, Cameroun',
+  '694880056',
+  '+237692765158',
+  'narcisse.arenthes@yahoo.fr',
+  'Jean Emmanuel',
+  'Fondateur & visionnaire du ministère',
+  'Porter l’Évangile sur le terrain, accompagner les personnes vulnérables et contribuer à la restauration des vies.'
+)
+ON DUPLICATE KEY UPDATE
+  church_name = VALUES(church_name),
+  slogan = VALUES(slogan),
+  mission = VALUES(mission),
+  vision = VALUES(vision),
+  address = VALUES(address),
+  phone = VALUES(phone),
+  whatsapp = VALUES(whatsapp),
+  email = VALUES(email),
+  pastor_name = VALUES(pastor_name),
+  pastor_title = VALUES(pastor_title),
+  pastor_bio = VALUES(pastor_bio);
 
 INSERT INTO pages (slug, title, content) VALUES
-('about', 'À propos', 'Gospel Break Chain Ministry est un ministère centré sur l’Évangile, la prière, la délivrance, la guérison, la restauration et la formation de disciples.'),
-('evangelisation', 'Évangélisation', 'Découvrir Jésus-Christ, comprendre l’Évangile et être accompagné dans sa marche avec Christ.')
+('about', 'Un ministère envoyé sur le terrain', 'Gospel Break Chain Ministry est un ministère chrétien dédié à l’évangélisation, aux missions et à la restauration des vies.'),
+('evangelisation', 'Évangélisation', 'Porter l’Évangile auprès des peuples non atteints et des communautés qui ont encore peu accès à la Bonne Nouvelle de Jésus-Christ.')
 ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content);
 
 INSERT INTO ministries (name, slug, description) VALUES
-('Louange', 'louange', 'Conduire l’assemblée dans la présence de Dieu par la louange et l’adoration.'),
-('Intercession', 'intercession', 'Porter les besoins de l’église, des familles et des nations dans la prière.'),
-('Jeunesse', 'jeunesse', 'Accompagner les jeunes dans leur foi et leur engagement.'),
-('Enfants', 'enfants', 'Former les enfants dans la foi chrétienne.'),
-('Évangélisation', 'evangelisation', 'Partager l’Évangile et gagner des âmes à Christ.'),
-('Accueil', 'accueil', 'Accueillir et orienter les personnes qui rejoignent l’église.'),
-('Communication', 'communication', 'Soutenir la communication et la diffusion des activités de l’église.'),
-('Média', 'media', 'Produire et diffuser les contenus audio-visuels du ministère.'),
-('Protocole', 'protocole', 'Assurer l’organisation et le bon déroulement des activités.')
+('Évangélisation & missions', 'evangelisation-missions', 'Aller vers les peuples non atteints et les communautés difficiles d’accès.'),
+('Enfance & solidarité', 'enfance-solidarite', 'Scolariser et accompagner les orphelins et demi-orphelins victimes de guerre.'),
+('Relation d’aide chrétienne', 'relation-aide', 'Écouter, accompagner, soutenir et prier pour les personnes en période de crise.')
 ON DUPLICATE KEY UPDATE name = VALUES(name), description = VALUES(description);
-
-INSERT INTO programs (title, description, day, start_time, end_time) VALUES
-('Culte dominical', 'Culte principal de l’église.', 'Dimanche', '08:00:00', '11:00:00'),
-('Culte de prière', 'Temps consacré à la prière.', 'Mercredi', '18:00:00', '20:00:00'),
-('Veillée de prières', 'Temps de prière et d’intercession.', 'Vendredi', '21:00:00', '00:00:00'),
-('École du dimanche', 'Enseignement biblique.', 'Dimanche', '08:00:00', '09:00:00');
-
-INSERT INTO sermons (title, description, preacher, published_at) VALUES
-('La puissance de la prière', 'Enseignement sur la puissance de la prière.', 'Pasteur Jean Emmanuel', NOW()),
-('Marcher dans la délivrance', 'Enseignement sur la liberté en Christ.', 'Pasteur Jean Emmanuel', NOW()),
-('Vivre la victoire en Christ', 'Message sur la victoire du croyant en Christ.', 'Pasteur Jean Emmanuel', NOW());
 
 INSERT INTO testimonials (name, content, status) VALUES
 ('Témoignage 1', 'Dieu a transformé ma vie et m’a donné une nouvelle espérance.', 'published'),
