@@ -30,8 +30,6 @@ CREATE TABLE church_settings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Identifies the principal church administrator without exposing church profile data
--- to developer endpoints.
 CREATE TABLE church_account_settings (
     id TINYINT UNSIGNED PRIMARY KEY,
     primary_admin_user_id INT UNSIGNED NULL,
@@ -51,8 +49,6 @@ CREATE TABLE user_admin_audit (
     INDEX idx_user_admin_audit_target (target_user_id)
 );
 
--- Developer-facing aggregate only. It deliberately contains no church profile,
--- contact, pastoral, donation or settings fields.
 CREATE OR REPLACE VIEW developer_site_summary AS
 SELECT
     (SELECT COUNT(*) FROM users WHERE is_active = TRUE) AS active_users,
@@ -81,18 +77,6 @@ CREATE TABLE ministries (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE programs (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(190) NOT NULL,
-    description TEXT NULL,
-    day VARCHAR(50) NULL,
-    start_time TIME NULL,
-    end_time TIME NULL,
-    status ENUM('draft','published') NOT NULL DEFAULT 'published',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
 CREATE TABLE events (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(190) NOT NULL,
@@ -105,26 +89,16 @@ CREATE TABLE events (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE sermons (
+CREATE TABLE event_photos (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(190) NOT NULL,
-    description TEXT NULL,
-    preacher VARCHAR(190) NULL,
-    video_url VARCHAR(500) NULL,
-    audio_url VARCHAR(500) NULL,
-    pdf_url VARCHAR(500) NULL,
-    published_at DATETIME NULL,
-    status ENUM('draft','published') NOT NULL DEFAULT 'published',
+    event_id INT UNSIGNED NOT NULL,
+    image VARCHAR(500) NOT NULL,
+    caption VARCHAR(255) NULL,
+    position VARCHAR(32) NULL,
+    sort_order INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE gallery_items (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(190) NULL,
-    type ENUM('image','video') NOT NULL DEFAULT 'image',
-    file_url VARCHAR(500) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    CONSTRAINT fk_event_photos_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    INDEX idx_event_photos_event_order (event_id, sort_order, id)
 );
 
 CREATE TABLE testimonials (

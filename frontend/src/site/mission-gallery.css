@@ -1,0 +1,107 @@
+.mission-section {
+  overflow: hidden;
+  background: #fff;
+}
+
+.mission-intro {
+  max-width: 760px;
+  margin-bottom: 30px;
+}
+
+.mission-gallery-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.mission-gallery {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 2px 18px;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mission-gallery::-webkit-scrollbar {
+  height: 7px;
+}
+
+.mission-gallery-card {
+  flex: 0 0 calc((100% - 36px) / 3);
+  min-width: 260px;
+  scroll-snap-align: start;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid rgba(9, 31, 58, .08);
+  box-shadow: 0 12px 30px rgba(9, 31, 58, .09);
+}
+
+.mission-gallery-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background-image: url('/mission-gallery.webp');
+  background-repeat: no-repeat;
+  background-size: 500% 200%;
+  background-color: #e9e7df;
+}
+
+.mission-gallery-caption {
+  padding: 14px 16px 16px;
+}
+
+.mission-gallery-caption strong {
+  display: block;
+  color: var(--navy);
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.mission-gallery-caption span {
+  display: block;
+  margin-top: 6px;
+  color: #78808b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 800;
+}
+
+.mission-gallery-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 4px;
+  color: #69727e;
+  font-size: 13px;
+}
+
+.mission-gallery-hint strong {
+  color: var(--navy);
+}
+
+@media (max-width: 900px) {
+  .mission-gallery-card {
+    flex-basis: calc((100% - 18px) / 2);
+  }
+}
+
+@media (max-width: 620px) {
+  .mission-gallery {
+    gap: 14px;
+  }
+
+  .mission-gallery-card {
+    flex-basis: 82%;
+    min-width: 0;
+  }
+
+  .mission-gallery-hint {
+    font-size: 12px;
+  }
+}

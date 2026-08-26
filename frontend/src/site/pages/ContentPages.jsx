@@ -4,6 +4,7 @@ import { CTA, SectionTitle } from "../components";
 import { churchApi } from '../../services/churchApi';
 import { useBibleVerse } from "../../useBibleVerse";
 import { church } from "../config";
+import { missionGallery } from "../missionGallery";
 
 function useRemote(loader, initialValue = []) {
   const [data, setData] = useState(initialValue);
@@ -120,6 +121,41 @@ export function Home() {
               <p style={{ fontStyle: "italic", lineHeight: 1.7 }}>
                 {settings.vision || church.vision}
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section mission-section" id="mission-terrain">
+        <div className="container">
+          <div className="mission-intro">
+            <SectionTitle
+              eyebrow="NOTRE MISSION SUR LE TERRAIN"
+              title="Des images qui racontent notre engagement"
+              text="Évangélisation, accompagnement, aide sociale, témoignages et travail auprès des enfants. Faites défiler les images pour découvrir les autres actions."
+            />
+          </div>
+
+          <div className="mission-gallery-wrap">
+            <div className="mission-gallery" aria-label="Galerie de la mission">
+              {missionGallery.map((photo) => (
+                <figure className="mission-gallery-card" key={photo.position + photo.title}>
+                  <div
+                    className="mission-gallery-image"
+                    role="img"
+                    aria-label={photo.title}
+                    style={{ backgroundPosition: photo.position }}
+                  />
+                  <figcaption className="mission-gallery-caption">
+                    <strong>{photo.title}</strong>
+                    <span>{photo.category}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+            <div className="mission-gallery-hint">
+              <span>Faites glisser horizontalement</span>
+              <strong>→ Voir les autres</strong>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-/* Shared hero treatment: keep the ministry emblem visually separated from the text column. */
+/* Shared responsive hero treatment. The hero must always fit the viewport width on small screens. */
 .hero-home,
 .page-hero{
   background-color:var(--navy);
@@ -9,9 +9,7 @@
   background-position:center,right center;
   background-size:auto,min(620px,50vw) auto;
 }
-
-.hero-home:after,
-.page-hero:after{content:none}
+.hero-home:after,.page-hero:after{content:none}
 .hero-content,.page-hero-content{position:relative}
 .hero-content > .eyebrow,.page-hero-content > .eyebrow{margin:0 0 14px;color:var(--gold);font-family:inherit;font-size:12px;line-height:1.2;font-weight:800;letter-spacing:.22em;text-transform:uppercase}
 .hero-content{padding:58px 20px 72px}
@@ -20,11 +18,9 @@
 .hero-content h1{font-size:clamp(36px,4.8vw,62px);line-height:1.02}
 .hero-content h1 span{display:block;margin-top:4px}
 .hero-verse{min-height:78px;display:grid;align-content:start;justify-items:start;margin:22px 0 4px;animation:hero-verse-slide-in .55s cubic-bezier(.22,.61,.36,1) both}
-.hero-verse .verse{margin:0;max-width:100%}
-.hero-verse>b{color:var(--gold);font-weight:800;margin-top:6px}
+.hero-verse .verse{margin:0;max-width:100%}.hero-verse>b{color:var(--gold);font-weight:800;margin-top:6px}
 @keyframes hero-verse-slide-in{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
-.page-hero{display:none}
-.hero-ornament{display:none}
+.page-hero{display:none}.hero-ornament{display:none}
 
 @media(max-width:900px){
   .hero-content > .eyebrow,.hero-content > h1,.hero-content > .hero-verse,.hero-content > .hero-actions{max-width:60%}
@@ -32,17 +28,30 @@
 }
 
 @media(max-width:760px){
-  .hero-home{min-height:620px;background-position:center,78% center;background-size:auto,78vw auto}
-  .hero-content{padding:52px 20px 64px}
-  .hero-content > .eyebrow,.hero-content > h1,.hero-content > .hero-verse,.hero-content > .hero-actions{width:100%;max-width:100%}
-  .hero-content h1{font-size:clamp(34px,9vw,46px)}
-  .hero-verse{min-height:118px;margin-top:18px}
+  .hero-home{
+    min-height:0;
+    height:auto;
+    background-position:center top,center bottom;
+    background-size:auto,100% auto;
+  }
+  .hero-content{
+    width:100%;
+    max-width:100%;
+    padding:42px 14px 190px;
+  }
+  .hero-content > .eyebrow,.hero-content > h1,.hero-content > .hero-verse,.hero-content > .hero-actions{
+    width:100%;max-width:100%;
+  }
+  .hero-content h1{font-size:clamp(34px,9vw,46px);line-height:1.04}
+  .hero-content .verse{font-size:14px;line-height:1.7}
+  .hero-verse{min-height:0;margin-top:18px}
+  .hero-actions{position:relative;z-index:3}
 }
 
 @media(max-width:480px){
-  .hero-content{padding-top:44px}
+  .hero-content{padding:38px 12px 175px}
   .hero-content h1{font-size:36px}
-  .hero-home{background-size:auto,100vw auto}
+  .hero-home{background-size:auto,100% auto;background-position:center top,center bottom}
   .page-hero-content > .eyebrow,.hero-content > .eyebrow{font-size:11px;letter-spacing:.18em}
 }
 

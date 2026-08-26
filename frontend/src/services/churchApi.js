@@ -23,7 +23,11 @@ async function requestChurchSettings() {
 }
 
 export const churchApi = {
-  health: () => request('/health'), church: requestChurchSettings, ministries: () => request('/ministries'), programs: () => request('/programs'), events: () => request('/events'), sermons: () => request('/sermons'), gallery: () => request('/gallery'), testimonials: () => request('/testimonials'),
+  health: () => request('/health'),
+  church: requestChurchSettings,
+  ministries: () => request('/ministries'),
+  events: () => request('/events'),
+  testimonials: () => request('/testimonials'),
   submitPrayerRequest: (data) => request('/prayer-requests', { method: 'POST', body: JSON.stringify(data) }),
   submitHelpRequest: (data) => request('/help-requests', { method: 'POST', body: JSON.stringify(data) }),
   submitTestimonial: (data) => request('/testimonials', { method: 'POST', body: JSON.stringify(data) }),
