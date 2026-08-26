@@ -3,7 +3,8 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import { Footer, Header } from './components';
 import MinistryHome from './MinistryHome';
 import PrayerPage from './PrayerPage';
-import { Programs, Events } from './pages/ContentPages';
+import EventsPage from './EventsPage';
+import { Programs } from './pages/ContentPages';
 import { Testimonials, Evangelism, Help, Donate } from './pages/InteractionPages';
 import { useScrollReveal } from './useScrollReveal';
 
@@ -22,7 +23,7 @@ export default function PublicApp() {
   return <div className="public-site"><ScrollToTop /><MotionObserver /><Header /><main><Routes>
     <Route path="/" element={<MinistryHome />} />
     <Route path="/programs" element={<Programs />} />
-    <Route path="/events" element={<Events />} />
+    <Route path="/events" element={<EventsPage />} />
     <Route path="/testimonials" element={<Testimonials />} />
     <Route path="/prayer" element={<PrayerPage />} />
     <Route path="/evangelism" element={<Evangelism />} />
