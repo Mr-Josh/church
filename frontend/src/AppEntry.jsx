@@ -1,6 +1,8 @@
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import './styles.css';
+import './typography.css';
+import './motion.css';
 import './responsive.css';
 import './hero-logo-fix.css';
 import './hero-layout.css';
