@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 function adminCrudRoute(PDO $db, string $path, string $method): void
 {
-    if (strpos($path, '/api/admin/') !== 0) {
-        return;
-    }
+    if (strpos($path, '/api/admin/') !== 0) return;
 
     $actor = requireRole($db, ['admin', 'developer']);
 
@@ -15,17 +13,14 @@ function adminCrudRoute(PDO $db, string $path, string $method): void
         return;
     }
 
-    // Every church resource and church setting is pastoral administration only.
     if ($actor['role'] !== 'admin') {
-        jsonResponse(['message' => 'Developer accounts cannot access church administration resources.'], 403);
+        jsonResponse(['message' => 'Developer accounts cannot access ministry administration resources.'], 403);
     }
 
     $resources = [
         'ministries' => 'ministries',
         'programs' => 'programs',
         'events' => 'events',
-        'sermons' => 'sermons',
-        'gallery' => 'gallery_items',
         'testimonials' => 'testimonials',
         'prayer-requests' => 'prayer_requests',
         'help-requests' => 'help_requests',
@@ -40,13 +35,10 @@ function adminCrudRoute(PDO $db, string $path, string $method): void
             jsonResponse(['data' => $stmt->fetchAll()]);
         }
 
-        if ($path === $base && $method === 'POST') {
-            createAdminResource($db, $resource, requestBody());
-        }
+        if ($path === $base && $method === 'POST') createAdminResource($db, $resource, requestBody());
 
         if (preg_match('#^' . preg_quote($base, '#') . '/(\d+)$#', $path, $match)) {
             $id = (int) $match[1];
-
             if ($method === 'GET') {
                 $stmt = $db->prepare("SELECT * FROM {$table} WHERE id = ? LIMIT 1");
                 $stmt->execute([$id]);
@@ -54,40 +46,13 @@ function adminCrudRoute(PDO $db, string $path, string $method): void
                 if (!$row) jsonResponse(['message' => 'Resource not found.'], 404);
                 jsonResponse(['data' => $row]);
             }
-
-            if ($method === 'PATCH') {
-                updateAdminResource($db, $resource, $id, requestBody());
-            }
-
+            if ($method === 'PATCH') updateAdminResource($db, $resource, $id, requestBody());
             if ($method === 'DELETE') {
                 $stmt = $db->prepare("DELETE FROM {$table} WHERE id = ?");
                 $stmt->execute([$id]);
                 jsonResponse(['message' => 'Resource deleted.']);
             }
         }
-    }
-
-    if ($path === '/api/admin/church-settings' && $method === 'GET') {
-        $stmt = $db->query('SELECT * FROM church_settings WHERE id = 1 LIMIT 1');
-        jsonResponse(['data' => $stmt->fetch()]);
-    }
-
-    if ($path === '/api/admin/church-settings' && $method === 'PATCH') {
-        $data = requestBody();
-        $allowed = ['church_name','slogan','mission','vision','address','phone','whatsapp','email'];
-        $sets = [];
-        $values = [];
-        foreach ($allowed as $field) {
-            if (array_key_exists($field, $data)) {
-                $sets[] = "{$field} = ?";
-                $values[] = $data[$field];
-            }
-        }
-        if (!$sets) jsonResponse(['message' => 'No fields to update.'], 422);
-        $values[] = 1;
-        $stmt = $db->prepare('UPDATE church_settings SET ' . implode(', ', $sets) . ' WHERE id = ?');
-        $stmt->execute($values);
-        jsonResponse(['message' => 'Church settings updated.']);
     }
 
     jsonResponse(['message' => 'Admin route not found.'], 404);
@@ -106,55 +71,32 @@ function handleUserCrud(PDO $db, array $actor, string $method, ?int $targetId): 
 
     if ($targetId !== null) {
         $target = getSameRoleUser($db, $targetId, $role);
-        if (!$target) {
-            jsonResponse(['message' => 'User not found.'], 404);
-        }
-
-        if ($method === 'GET') {
-            jsonResponse(['data' => $target]);
-        }
+        if (!$target) jsonResponse(['message' => 'User not found.'], 404);
+        if ($method === 'GET') jsonResponse(['data' => $target]);
 
         if ($method === 'PATCH') {
-            $data = requestBody();
-            $sets = [];
-            $values = [];
-
+            $data = requestBody(); $sets = []; $values = [];
             if (array_key_exists('name', $data)) {
                 $name = trim((string) $data['name']);
                 if ($name === '') jsonResponse(['message' => 'Name cannot be empty.'], 422);
-                $sets[] = 'name = ?';
-                $values[] = $name;
+                $sets[] = 'name = ?'; $values[] = $name;
             }
-
             if (array_key_exists('email', $data)) {
                 $email = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
                 if (!$email) jsonResponse(['message' => 'A valid email is required.'], 422);
-                $sets[] = 'email = ?';
-                $values[] = $email;
+                $sets[] = 'email = ?'; $values[] = $email;
             }
-
             if (array_key_exists('is_active', $data)) {
                 $active = (bool) $data['is_active'];
-                if (!$active && (int) $target['id'] === (int) $actor['id']) {
-                    jsonResponse(['message' => 'You cannot deactivate your own account.'], 422);
-                }
-                if (!$active && isLastActiveRoleUser($db, $role, (int) $target['id'])) {
-                    jsonResponse(['message' => "Cannot deactivate the last active {$tableRole} account."], 409);
-                }
-                $sets[] = 'is_active = ?';
-                $values[] = $active ? 1 : 0;
+                if (!$active && (int) $target['id'] === (int) $actor['id']) jsonResponse(['message' => 'You cannot deactivate your own account.'], 422);
+                if (!$active && isLastActiveRoleUser($db, $role, (int) $target['id'])) jsonResponse(['message' => "Cannot deactivate the last active {$tableRole} account."], 409);
+                $sets[] = 'is_active = ?'; $values[] = $active ? 1 : 0;
             }
-
             if (!empty($data['password'])) {
-                if (strlen((string) $data['password']) < 8) {
-                    jsonResponse(['message' => 'Password must contain at least 8 characters.'], 422);
-                }
-                $sets[] = 'password = ?';
-                $values[] = password_hash((string) $data['password'], PASSWORD_DEFAULT);
+                if (strlen((string) $data['password']) < 8) jsonResponse(['message' => 'Password must contain at least 8 characters.'], 422);
+                $sets[] = 'password = ?'; $values[] = password_hash((string) $data['password'], PASSWORD_DEFAULT);
             }
-
             if (!$sets) jsonResponse(['message' => 'No fields to update.'], 422);
-
             $values[] = (int) $target['id'];
             try {
                 $stmt = $db->prepare('UPDATE users SET ' . implode(', ', $sets) . ' WHERE id = ?');
@@ -163,19 +105,13 @@ function handleUserCrud(PDO $db, array $actor, string $method, ?int $targetId): 
                 if ((int) $e->errorInfo[1] === 1062) jsonResponse(['message' => 'This email is already in use.'], 409);
                 throw $e;
             }
-
             recordUserAudit($db, (int) $actor['id'], (int) $target['id'], 'update');
             jsonResponse(['message' => ucfirst($tableRole) . ' account updated.']);
         }
 
         if ($method === 'DELETE') {
-            if ((int) $target['id'] === (int) $actor['id']) {
-                jsonResponse(['message' => 'You cannot delete your own account.'], 422);
-            }
-            if (isLastActiveRoleUser($db, $role, (int) $target['id'])) {
-                jsonResponse(['message' => "Cannot delete the last active {$tableRole} account."], 409);
-            }
-
+            if ((int) $target['id'] === (int) $actor['id']) jsonResponse(['message' => 'You cannot delete your own account.'], 422);
+            if (isLastActiveRoleUser($db, $role, (int) $target['id'])) jsonResponse(['message' => "Cannot delete the last active {$tableRole} account."], 409);
             $stmt = $db->prepare('DELETE FROM users WHERE id = ? AND role = ?');
             $stmt->execute([(int) $target['id'], $role]);
             recordUserAudit($db, (int) $actor['id'], (int) $target['id'], 'delete');
@@ -188,20 +124,12 @@ function handleUserCrud(PDO $db, array $actor, string $method, ?int $targetId): 
         $email = filter_var($data['email'] ?? '', FILTER_VALIDATE_EMAIL);
         $password = (string) ($data['password'] ?? '');
         $name = trim((string) ($data['name'] ?? ''));
-
         if (!$email) jsonResponse(['message' => 'A valid email is required.'], 422);
         if (strlen($password) < 8) jsonResponse(['message' => 'Password must contain at least 8 characters.'], 422);
         if ($name === '') $name = $role === 'developer' ? 'Developer' : 'Administrateur';
-
-        // The role is derived exclusively from the authenticated actor.
         $stmt = $db->prepare('INSERT INTO users (name, email, password, role, is_active) VALUES (?, ?, ?, ?, 1)');
-        try {
-            $stmt->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT), $role]);
-        } catch (PDOException $e) {
-            if ((int) $e->errorInfo[1] === 1062) jsonResponse(['message' => 'This email is already in use.'], 409);
-            throw $e;
-        }
-
+        try { $stmt->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT), $role]); }
+        catch (PDOException $e) { if ((int) $e->errorInfo[1] === 1062) jsonResponse(['message' => 'This email is already in use.'], 409); throw $e; }
         $newId = (int) $db->lastInsertId();
         recordUserAudit($db, (int) $actor['id'], $newId, 'create');
         jsonResponse(['message' => ucfirst($tableRole) . ' account created.', 'id' => $newId], 201);
@@ -236,24 +164,12 @@ function createAdminResource(PDO $db, string $resource, array $data): never
         'ministries' => ['name','slug','description','image','status'],
         'programs' => ['title','description','day','start_time','end_time','status'],
         'events' => ['title','description','image','event_date','location','status'],
-        'sermons' => ['title','description','preacher','video_url','audio_url','pdf_url','published_at','status'],
-        'gallery' => ['title','type','file_url'],
         'testimonials' => ['name','content','photo','status'],
     ];
-
-    if (!isset($definitions[$resource])) {
-        jsonResponse(['message' => 'This resource cannot be created here.'], 405);
-    }
-
+    if (!isset($definitions[$resource])) jsonResponse(['message' => 'This resource cannot be created here.'], 405);
     $fields = $definitions[$resource];
-    $values = [];
-    foreach ($fields as $field) {
-        $values[] = $data[$field] ?? null;
-    }
-
-    $table = $resource === 'gallery' ? 'gallery_items' : $resource;
-    $placeholders = implode(', ', array_fill(0, count($fields), '?'));
-    $stmt = $db->prepare('INSERT INTO ' . $table . ' (' . implode(', ', $fields) . ') VALUES (' . $placeholders . ')');
+    $values = array_map(fn($field) => $data[$field] ?? null, $fields);
+    $stmt = $db->prepare('INSERT INTO ' . $resource . ' (' . implode(', ', $fields) . ') VALUES (' . implode(', ', array_fill(0, count($fields), '?')) . ')');
     $stmt->execute($values);
     jsonResponse(['message' => 'Resource created.', 'id' => (int) $db->lastInsertId()], 201);
 }
@@ -264,31 +180,18 @@ function updateAdminResource(PDO $db, string $resource, int $id, array $data): n
         'ministries' => ['name','slug','description','image','status'],
         'programs' => ['title','description','day','start_time','end_time','status'],
         'events' => ['title','description','image','event_date','location','status'],
-        'sermons' => ['title','description','preacher','video_url','audio_url','pdf_url','published_at','status'],
-        'gallery' => ['title','type','file_url'],
         'testimonials' => ['name','content','photo','status'],
         'prayer-requests' => ['name','phone','email','subject','message','is_confidential','is_urgent','status'],
         'help-requests' => ['name','phone','message','status'],
         'donations' => ['name','phone','amount','type','payment_method','transaction_id','status'],
     ];
-
     $fields = $definitions[$resource] ?? [];
     if (!$fields) jsonResponse(['message' => 'This resource cannot be updated here.'], 405);
-
-    $sets = [];
-    $values = [];
-    foreach ($fields as $field) {
-        if (array_key_exists($field, $data)) {
-            $sets[] = "{$field} = ?";
-            $values[] = $data[$field];
-        }
-    }
-
+    $sets = []; $values = [];
+    foreach ($fields as $field) if (array_key_exists($field, $data)) { $sets[] = "{$field} = ?"; $values[] = $data[$field]; }
     if (!$sets) jsonResponse(['message' => 'No fields to update.'], 422);
-
-    $table = $resource === 'gallery' ? 'gallery_items' : $resource;
     $values[] = $id;
-    $stmt = $db->prepare('UPDATE ' . $table . ' SET ' . implode(', ', $sets) . ' WHERE id = ?');
+    $stmt = $db->prepare('UPDATE ' . ($resource === 'prayer-requests' ? 'prayer_requests' : ($resource === 'help-requests' ? 'help_requests' : $resource)) . ' SET ' . implode(', ', $sets) . ' WHERE id = ?');
     $stmt->execute($values);
     jsonResponse(['message' => 'Resource updated.']);
 }
