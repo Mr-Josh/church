@@ -46,11 +46,29 @@ const projects = [
 
 const prayerPoints = ['Peuples non atteints', 'Équipes missionnaires', 'Enfants victimes des conflits', 'Familles touchées par la guerre', 'Nouvelles portes pour l’Évangile', 'Protection des équipes et ressources nécessaires'];
 
+function EventPreviewCard({ event }) {
+  const photo = Array.isArray(event.photos) && event.photos.length ? event.photos[0] : null;
+  const image = photo?.image || event.image;
+  return (
+    <Link to="/events" className="impact-event-card">
+      {image ? <div className="impact-event-image" style={{ backgroundImage: `url(${image})`, backgroundPosition: photo?.position || 'center' }} /> : <div className="impact-event-image impact-event-image-empty"><span>PHOTO À VENIR</span></div>}
+      <div className="impact-event-content">
+        <span className="gold-label">ACTION DE TERRAIN</span>
+        <h3>{event.title}</h3>
+        <p>{event.description || 'Découvrez cette action réalisée par le ministère.'}</p>
+        <span className="impact-event-link">Voir les détails →</span>
+      </div>
+    </Link>
+  );
+}
+
 export default function MinistryHome() {
   const settings = useSettings();
   const testimonials = useRemote(churchApi.testimonials);
+  const events = useRemote(churchApi.events);
   const pastorName = settings.pastor_name || 'Jean Emmanuel';
   const whatsapp = settings.whatsapp ? `https://wa.me/${String(settings.whatsapp).replace(/\D/g, '')}` : '';
+  const visibleEvents = events.filter((event) => event.status !== 'draft').slice(0, 3);
 
   return <>
     <section className="hero-home ministry-hero"><div className="container hero-content">
@@ -79,7 +97,12 @@ export default function MinistryHome() {
 
     <section className="section soft"><div className="container"><SectionTitle eyebrow="NOS PROJETS" title="DES PROJETS QUI ONT BESOIN DE VOUS" /><div className="project-grid">{projects.map(([title, text, to, action]) => <article className="project-card" key={title}><h3>{title}</h3><p>{text}</p><Link className="text-action" to="/prayer">Appel à la prière →</Link><CTA to={to}>{action}</CTA></article>)}</div></div></section>
 
-    <section className="section"><div className="container"><SectionTitle eyebrow="IMPACT / ACTIONS RÉALISÉES" title="ILS ONT VU L’ACTION" text="Découvrez ce que Dieu accomplit sur le terrain." /><div className="impact-grid"><div className="impact-placeholder"><b>MISSIONS</b><span>Photos des actions de terrain</span><small>Emplacement prévu pour les prochaines photos et récits.</small></div><div className="impact-placeholder"><b>ENFANCE & SOLIDARITÉ</b><span>Actions sociales et éducatives</span><small>Emplacement prévu pour les actions réalisées.</small></div><div className="impact-placeholder"><b>RESTAURATION</b><span>Des vies restaurées</span><small>Emplacement prévu pour les témoignages du terrain.</small></div></div></div></section>
+    <section className="section"><div className="container"><SectionTitle eyebrow="IMPACT / ACTIONS RÉALISÉES" title="ILS ONT VU L’ACTION" text="Découvrez ce que Dieu accomplit sur le terrain." />
+      <div className="impact-grid impact-events-grid">
+        {visibleEvents.length ? visibleEvents.map((event) => <EventPreviewCard key={event.id} event={event} />) : <div className="impact-empty"><b>Nos actions arrivent bientôt</b><span>Les prochaines actions de terrain seront publiées ici avec leurs photos et leurs récits.</span></div>}
+      </div>
+      <div className="impact-events-more"><CTA to="/events">Voir tous les événements →</CTA></div>
+    </div></section>
 
     <section className="section soft"><div className="container"><SectionTitle eyebrow="TÉMOIGNAGES" title="Des vies transformées" /><div className="quote-card"><span>“</span>{testimonials.length ? <><p>{testimonials[0].content}</p><b>— {testimonials[0].name}</b></> : <p>Les témoignages des personnes accompagnées seront publiés ici après validation.</p>}<CTA to="/testimonials">Partager votre témoignage</CTA></div></div></section>
 
