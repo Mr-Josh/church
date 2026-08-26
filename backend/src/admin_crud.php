@@ -13,12 +13,10 @@ function adminCrudRoute(PDO $db, string $path, string $method): void
         return;
     }
 
-    if ($actor['role'] !== 'admin') {
-        jsonResponse(['message' => 'Developer accounts cannot access ministry administration resources.'], 403);
-    }
+    if ($actor['role'] !== 'admin') jsonResponse(['message' => 'Developer accounts cannot access ministry administration resources.'], 403);
 
     $resources = [
-        'ministries' => 'ministries', 'programs' => 'programs', 'events' => 'events',
+        'ministries' => 'ministries', 'events' => 'events',
         'event-photos' => 'event_photos', 'testimonials' => 'testimonials',
         'prayer-requests' => 'prayer_requests', 'help-requests' => 'help_requests', 'donations' => 'donations',
     ];
@@ -88,11 +86,8 @@ function recordUserAudit(PDO $db, int $actorId, int $targetId, string $action): 
 function createAdminResource(PDO $db, string $resource, array $data): never
 {
     $definitions = [
-        'ministries' => ['name','slug','description','image','status'],
-        'programs' => ['title','description','day','start_time','end_time','status'],
-        'events' => ['title','description','image','event_date','location','status'],
-        'event-photos' => ['event_id','image','caption','position','sort_order'],
-        'testimonials' => ['name','content','photo','status'],
+        'ministries' => ['name','slug','description','image','status'], 'events' => ['title','description','image','event_date','location','status'],
+        'event-photos' => ['event_id','image','caption','position','sort_order'], 'testimonials' => ['name','content','photo','status'],
     ];
     if (!isset($definitions[$resource])) jsonResponse(['message' => 'This resource cannot be created here.'], 405);
     $fields = $definitions[$resource]; $table = $resource === 'event-photos' ? 'event_photos' : $resource;
@@ -106,9 +101,9 @@ function createAdminResource(PDO $db, string $resource, array $data): never
 function updateAdminResource(PDO $db, string $resource, int $id, array $data): never
 {
     $definitions = [
-        'ministries' => ['name','slug','description','image','status'], 'programs' => ['title','description','day','start_time','end_time','status'],
-        'events' => ['title','description','image','event_date','location','status'], 'event-photos' => ['event_id','image','caption','position','sort_order'],
-        'testimonials' => ['name','content','photo','status'], 'prayer-requests' => ['name','phone','email','subject','message','is_confidential','is_urgent','status'],
+        'ministries' => ['name','slug','description','image','status'], 'events' => ['title','description','image','event_date','location','status'],
+        'event-photos' => ['event_id','image','caption','position','sort_order'], 'testimonials' => ['name','content','photo','status'],
+        'prayer-requests' => ['name','phone','email','subject','message','is_confidential','is_urgent','status'],
         'help-requests' => ['name','phone','message','status'], 'donations' => ['name','phone','amount','type','payment_method','transaction_id','status'],
     ];
     $fields = $definitions[$resource] ?? []; if (!$fields) jsonResponse(['message' => 'This resource cannot be updated here.'], 405);
