@@ -44,7 +44,7 @@
 .mission-gallery-image {
   width: 100%;
   aspect-ratio: 4 / 3;
-  background-image: url('/mission-gallery.jpg');
+  background-image: url('/mission-gallery.webp');
   background-repeat: no-repeat;
   background-size: 500% 200%;
   background-color: #e9e7df;
