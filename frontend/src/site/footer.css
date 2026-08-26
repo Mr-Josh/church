@@ -12,6 +12,9 @@
 .footer-bottom { align-items: center; }
 .footer-anchor-link { margin: 0 0 8px; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .footer-anchor-link:hover { color: var(--gold); }
+.footer-whatsapp-link { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; margin-top: 8px; color: #25D366; text-decoration: none; }
+.footer-whatsapp-icon { width: 34px; height: 34px; display: block; transition: transform .2s ease, opacity .2s ease; }
+.footer-whatsapp-link:hover .footer-whatsapp-icon { transform: scale(1.08); opacity: .9; }
 
 @media (min-width: 1101px) {
   .footer-main { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; }
