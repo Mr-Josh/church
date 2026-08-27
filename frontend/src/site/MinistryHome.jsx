@@ -251,7 +251,7 @@ export default function MinistryHome() {
           />
           <div>
             <span className="gold-label">LE MISSIONAIRE</span>
-            <h2>{pastorName}</h2>
+            <h2>Narcisse Arenthes Tienko</h2>
             <h3>
               {settings.pastor_title || "Fondateur & visionnaire du ministère"}
             </h3>
