@@ -33,29 +33,35 @@ INSERT INTO testimonials (name, content, status) VALUES
 ('Témoignage 2', 'J’ai retrouvé la paix grâce à la prière et à l’accompagnement reçu.', 'published');
 
 INSERT INTO events (title, description, image, event_date, location, status) VALUES
-('Actions de terrain', 'Retour en images sur les actions d’évangélisation, de solidarité et d’accompagnement menées sur le terrain.', '/mission-gallery.webp', '2026-08-15 09:00:00', 'Cameroun', 'published'),
-('Enfance & solidarité', 'Des moments consacrés aux enfants et aux familles vulnérables, avec une attention portée à l’accompagnement et à l’espérance.', '/mission-gallery.webp', '2026-08-08 10:00:00', 'Cameroun', 'published'),
-('Mission & accompagnement', 'Des équipes engagées auprès des communautés pour annoncer l’Évangile, écouter, accompagner et servir.', '/mission-gallery.webp', '2026-08-01 09:00:00', 'Cameroun', 'published');
+('Actions de terrain', 'Retour en images sur les actions d’évangélisation, de solidarité et d’accompagnement menées sur le terrain.', '/1.png', '2026-08-15 09:00:00', 'Cameroun', 'published'),
+('Enfance & solidarité', 'Des moments consacrés aux enfants et aux familles vulnérables, avec une attention portée à l’accompagnement et à l’espérance.', '/5.png', '2026-08-08 10:00:00', 'Cameroun', 'published'),
+('Mission & accompagnement', 'Des équipes engagées auprès des communautés pour annoncer l’Évangile, écouter, accompagner et servir.', '/9.png', '2026-08-01 09:00:00', 'Cameroun', 'published');
 
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/mission-gallery.webp', 'Baptême – une foi vivante', '0% 0%', 1 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
+SELECT id, '/1.png', 'Visite de terrain – présence auprès des familles', 'center', 1 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/mission-gallery.webp', 'Évangélisation – aller vers les gens', '25% 0%', 2 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
+SELECT id, '/2.png', 'Rassemblement villageois – aller vers les gens', 'center', 2 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/mission-gallery.webp', 'Femmes – soutien et encouragement', '50% 0%', 3 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
+SELECT id, '/3.png', 'Soirée d’évangélisation – proclamation et prière', 'center', 3 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
+INSERT INTO event_photos (event_id, image, caption, position, sort_order)
+SELECT id, '/4.png', 'Femmes et enfants – écoute et encouragement', 'center', 4 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
 
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/mission-gallery.webp', 'Enfants – l’avenir nous tient à cœur', '75% 0%', 1 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
+SELECT id, '/5.png', 'Enfants – l’avenir nous tient à cœur', 'center', 1 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/mission-gallery.webp', 'Action communautaire – présence auprès des familles', '100% 0%', 2 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
+SELECT id, '/6.png', 'Action communautaire – présence auprès des familles', 'center', 2 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/mission-gallery.webp', 'Enfants rassemblés – chaque enfant compte', '100% 100%', 3 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
+SELECT id, '/7.png', 'Solidarité – chaque enfant compte', 'center', 3 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
+INSERT INTO event_photos (event_id, image, caption, position, sort_order)
+SELECT id, '/8.png', 'Accompagnement – restaurer l’espérance', 'center', 4 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
 
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/mission-gallery.webp', 'Rencontre – accompagner les communautés', '0% 100%', 1 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
+SELECT id, '/9.png', 'Rencontre – accompagner les communautés', 'center', 1 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/mission-gallery.webp', 'Distribution – aider concrètement', '25% 100%', 2 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
+SELECT id, '/10.png', 'Sur le terrain – au plus près des besoins', 'center', 2 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/mission-gallery.webp', 'Sur le terrain – au plus près des besoins', '50% 100%', 3 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
+SELECT id, '/11.png', 'Distribution – aider concrètement', 'center', 3 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/mission-gallery.webp', 'Équipe missionnaire – au service de la mission', '75% 100%', 4 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
+SELECT id, '/12.png', 'Équipe missionnaire – au service de la mission', 'center', 4 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
+INSERT INTO event_photos (event_id, image, caption, position, sort_order)
+SELECT id, '/13.png', 'Mission – porter l’Évangile là où il est peu connu', 'center', 5 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;

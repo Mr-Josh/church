@@ -139,12 +139,12 @@ export function Home() {
           <div className="mission-gallery-wrap">
             <div className="mission-gallery" aria-label="Galerie de la mission">
               {missionGallery.map((photo) => (
-                <figure className="mission-gallery-card" key={photo.position + photo.title}>
+                <figure className="mission-gallery-card" key={photo.image}>
                   <div
                     className="mission-gallery-image"
                     role="img"
                     aria-label={photo.title}
-                    style={{ backgroundPosition: photo.position }}
+                    style={{ backgroundImage: `url(${photo.image})` }}
                   />
                   <figcaption className="mission-gallery-caption">
                     <strong>{photo.title}</strong>

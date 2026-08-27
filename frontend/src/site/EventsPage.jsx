@@ -14,12 +14,12 @@ function EventGalleryBlock({ event }) {
       </div>
       <div className="event-gallery-scroll" aria-label={`Photos de ${event.eventTitle}`}>
         {event.photos.map((photo) => (
-          <figure className="event-gallery-photo" key={`${event.eventTitle}-${photo.position}`}>
+          <figure className="event-gallery-photo" key={`${event.eventTitle}-${photo.image}`}>
             <div
               className="event-gallery-photo-image"
               role="img"
               aria-label={photo.caption}
-              style={{ backgroundImage: `url(${photo.image})`, backgroundPosition: photo.position }}
+              style={{ backgroundImage: `url(${photo.image})`, backgroundPosition: photo.position || 'center' }}
             />
             <figcaption>{photo.caption}</figcaption>
           </figure>

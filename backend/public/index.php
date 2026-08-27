@@ -10,6 +10,7 @@ require __DIR__ . '/../src/router.php';
 require __DIR__ . '/../src/admin.php';
 require __DIR__ . '/../src/admin_crud.php';
 require __DIR__ . '/../src/dev.php';
+require __DIR__ . '/../src/upload.php';
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? ($config['cors_origin'] ?? 'http://localhost:5174');
 header('Access-Control-Allow-Origin: ' . $origin);
@@ -75,6 +76,10 @@ if ($path === '/api/admin/church-settings') {
         jsonResponse(['message' => 'Church settings updated.']);
     }
     jsonResponse(['message' => 'Method not allowed.'], 405);
+}
+
+if ($path === '/api/admin/uploads' && $method === 'POST') {
+    handleAdminUpload($db, $config);
 }
 
 if (strpos($path, '/api/admin/') === 0) adminCrudRoute($db, $path, $method);

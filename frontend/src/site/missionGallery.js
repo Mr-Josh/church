@@ -1,14 +1,17 @@
 import './mission-gallery.css';
 
 export const missionGallery = [
-  { position: '0% 0%', title: 'Baptême – une foi vivante', category: 'Foi & évangélisation' },
-  { position: '25% 0%', title: 'Évangélisation – aller vers les gens', category: 'Évangélisation' },
-  { position: '50% 0%', title: 'Femmes – soutien et encouragement', category: 'Communauté' },
-  { position: '75% 0%', title: 'Enfants – l’avenir nous tient à cœur', category: 'Enfance' },
-  { position: '100% 0%', title: 'Action communautaire – présence auprès des familles', category: 'Action sociale' },
-  { position: '0% 100%', title: 'Rencontre – accompagner les communautés', category: 'Communauté' },
-  { position: '25% 100%', title: 'Distribution – aider concrètement', category: 'Action sociale' },
-  { position: '50% 100%', title: 'Sur le terrain – au plus près des besoins', category: 'Mission' },
-  { position: '75% 100%', title: 'Équipe missionnaire – au service de la mission', category: 'Équipe' },
-  { position: '100% 100%', title: 'Enfants rassemblés – chaque enfant compte', category: 'Enfance' },
+  { image: '/1.png', title: 'Visite de terrain – présence auprès des familles', category: 'Mission' },
+  { image: '/2.png', title: 'Rassemblement villageois – aller vers les gens', category: 'Évangélisation' },
+  { image: '/3.png', title: 'Soirée d’évangélisation – proclamation et prière', category: 'Foi & évangélisation' },
+  { image: '/4.png', title: 'Femmes et enfants – écoute et encouragement', category: 'Communauté' },
+  { image: '/5.png', title: 'Enfants – l’avenir nous tient à cœur', category: 'Enfance' },
+  { image: '/6.png', title: 'Action communautaire – présence auprès des familles', category: 'Action sociale' },
+  { image: '/7.png', title: 'Solidarité – chaque enfant compte', category: 'Enfance' },
+  { image: '/8.png', title: 'Accompagnement – restaurer l’espérance', category: 'Relation d’aide' },
+  { image: '/9.png', title: 'Rencontre – accompagner les communautés', category: 'Communauté' },
+  { image: '/10.png', title: 'Sur le terrain – au plus près des besoins', category: 'Mission' },
+  { image: '/11.png', title: 'Distribution – aider concrètement', category: 'Action sociale' },
+  { image: '/12.png', title: 'Équipe missionnaire – au service de la mission', category: 'Équipe' },
+  { image: '/13.png', title: 'Mission – porter l’Évangile là où il est peu connu', category: 'Évangélisation' },
 ];
