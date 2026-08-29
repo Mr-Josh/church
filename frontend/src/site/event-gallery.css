@@ -119,7 +119,7 @@
     min-width: 0;
   }
   .event-gallery-photo-image {
-    height: 80px; /* reduce height for tiny screens */
-    aspect-ratio: auto;
+    height: auto; /* natural height */
+    aspect-ratio: 4/3; /* maintain original ratio */
   }
 }
