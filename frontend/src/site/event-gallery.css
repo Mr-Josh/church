@@ -10,8 +10,11 @@
   box-shadow: 0 16px 40px rgba(9, 31, 58, 0.07);
 }
 .event-gallery-copy {
+  width: 100%;
   max-width: 780px;
-  margin-bottom: 24px;
+  margin: 0 auto 24px;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 .event-gallery-copy h2 {
   margin: 8px 0 10px;
@@ -101,14 +104,15 @@
 }
 @media (max-width: 620px) {
   .event-gallery-block {
-    padding: 20px;
+    padding: 12px;
   }
-    .event-gallery-photo {
-      flex-basis: 100%;
-      min-width: 0;
-    }
+  .event-gallery-photo {
+    flex: 0 0 100%;
+   
+    max-width: 70%;
+  }
   .event-gallery-scroll {
-    gap: 14px;
+    gap: 8px;
   }
 }
 
