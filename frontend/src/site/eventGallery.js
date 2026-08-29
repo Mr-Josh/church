@@ -29,7 +29,7 @@ export const eventGallery = [
       { image: '/9.png', position: 'center', caption: 'Rencontre – accompagner les communautés' },
       { image: '/10.png', position: 'center', caption: 'Sur le terrain – au plus près des besoins' },
       { image: '/11.png', position: 'center', caption: 'Distribution – aider concrètement' },
-      { image: '/12.png', position: 'center', caption: 'Équipe missionnaire – au service de la mission' },
+      { image: '/12.png', position: 'center', caption: 'Orphelins scolarisés – soutenir l’avenir de l’enfance' },
       { image: '/13.png', position: 'center', caption: 'Mission – porter l’Évangile là où il est peu connu' },
     ],
   },

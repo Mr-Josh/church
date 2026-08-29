@@ -18,13 +18,26 @@ function normalize(items) {
 
 export function TestimonialCarousel({ items = [], autoPlay = true }) {
   const testimonials = useMemo(() => normalize(items), [items]);
+  const [itemsPerPage, setItemsPerPage] = useState(2);
+
+  // Update items per page based on viewport width
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      const width = window.innerWidth;
+      setItemsPerPage(width < 600 ? 1 : 2);
+    };
+    updateItemsPerPage();
+    window.addEventListener('resize', updateItemsPerPage);
+    return () => window.removeEventListener('resize', updateItemsPerPage);
+  }, []);
+
   const pages = useMemo(() => {
     const result = [];
-    for (let index = 0; index < testimonials.length; index += 2) {
-      result.push(testimonials.slice(index, index + 2));
+    for (let index = 0; index < testimonials.length; index += itemsPerPage) {
+      result.push(testimonials.slice(index, index + itemsPerPage));
     }
     return result;
-  }, [testimonials]);
+  }, [testimonials, itemsPerPage]);
 
   const pageCount = pages.length;
   const [page, setPage] = useState(0);

@@ -12,6 +12,6 @@ export const missionGallery = [
   { image: '/9.png', title: 'Rencontre – accompagner les communautés', category: 'Communauté' },
   { image: '/10.png', title: 'Sur le terrain – au plus près des besoins', category: 'Mission' },
   { image: '/11.png', title: 'Distribution – aider concrètement', category: 'Action sociale' },
-  { image: '/12.png', title: 'Équipe missionnaire – au service de la mission', category: 'Équipe' },
+  { image: '/12.png', title: 'Orphelins scolarisés – soutenir l\'avenir de l\'enfance', category: 'Enfance' },
   { image: '/13.png', title: 'Mission – porter l’Évangile là où il est peu connu', category: 'Évangélisation' },
 ];
