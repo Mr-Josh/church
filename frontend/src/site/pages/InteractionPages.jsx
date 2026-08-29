@@ -388,7 +388,7 @@ export function Evangelism() {
 export function Help() {
   const [open, setOpen] = useState(0);
   const questions = [
-    "Comment assister aux cultes ?",
+    "Comment aller prêcher avec nous ?",
     "Comment faire une demande de prière ?",
     "Comment rejoindre un ministère ?",
     "Comment faire un don ?",
@@ -399,7 +399,7 @@ export function Help() {
     const text = topic
       ? `Bonjour,\n\nJ'ai besoin d'assistance et d'accompagnement concernant : "${topic}".\n\nMerci de bien vouloir m'éclairer. Que Dieu vous bénisse !`
       : `Bonjour,\n\nJ'ai besoin d'un accompagnement / d'une assistance auprès du ministère.\n\nPouvons-nous échanger ? Merci et que Dieu vous bénisse !`;
-    return `https://wa.me/237692765158?text=${encodeURIComponent(text)}`;
+    return `https://wa.me/237694880056?text=${encodeURIComponent(text)}`;
   };
 
   return (
@@ -423,18 +423,48 @@ export function Help() {
               </button>
               {open === index && (
                 <div style={{ marginTop: 8 }}>
-                  <p style={{ margin: "0 0 12px 0" }}>
-                    Pour cette question, contactez directement l'équipe de l'église sur WhatsApp afin d'obtenir une réponse personnalisée.
-                  </p>
-                  <a
-                    className="btn outline"
-                    style={{ display: "inline-flex", padding: "8px 14px", fontSize: 13 }}
-                    href={getHelpWhatsAppUrl(question)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Poser cette question sur WhatsApp <span>→</span>
-                  </a>
+                  {question === "Comment faire une demande de prière ?" ? (
+                    <>
+                      <p style={{ margin: "0 0 12px 0" }}>
+                        Vous pouvez soumettre votre sujet de prière en ligne sur notre page dédiée.
+                      </p>
+                      <Link
+                        className="btn outline"
+                        style={{ display: "inline-flex", padding: "8px 14px", fontSize: 13 }}
+                        to="/prayer"
+                      >
+                        Faire une demande de prière <span>→</span>
+                      </Link>
+                    </>
+                  ) : question === "Comment faire un don ?" ? (
+                    <>
+                      <p style={{ margin: "0 0 12px 0" }}>
+                        Soutenez notre église et ses actions en effectuant un don en ligne sécurisé.
+                      </p>
+                      <Link
+                        className="btn outline"
+                        style={{ display: "inline-flex", padding: "8px 14px", fontSize: 13 }}
+                        to="/donate"
+                      >
+                        Faire un don en ligne <span>→</span>
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <p style={{ margin: "0 0 12px 0" }}>
+                        Pour cette question, contactez directement l'équipe du ministère sur WhatsApp afin d'obtenir une réponse.
+                      </p>
+                      <a
+                        className="btn outline"
+                        style={{ display: "inline-flex", padding: "8px 14px", fontSize: 13 }}
+                        href={getHelpWhatsAppUrl(question)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Poser cette question sur WhatsApp <span>→</span>
+                      </a>
+                    </>
+                  )}
                 </div>
               )}
             </div>

@@ -1,5 +1,11 @@
 USE church;
 
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE event_photos;
+TRUNCATE TABLE events;
+TRUNCATE TABLE testimonials;
+SET FOREIGN_KEY_CHECKS = 1;
+
 INSERT INTO church_settings (id, church_name, slogan, mission, vision, address, phone, whatsapp, email, pastor_name, pastor_title, pastor_bio)
 VALUES (
   1,
@@ -9,9 +15,9 @@ VALUES (
   'Restaurer, libérer et impacter.',
   'Mora, Extrême-Nord, Cameroun',
   '694880056',
-  '+237692765158',
+  '694880056',
   'narcisse.arenthes@yahoo.fr',
-  'Jean Emmanuel',
+  'Narcisse Arenthes Tienko',
   'Fondateur & visionnaire du ministère',
   'Porter l’Évangile sur le terrain, accompagner les personnes vulnérables et contribuer à la restauration des vies.'
 )
@@ -62,6 +68,6 @@ SELECT id, '/10.png', 'Sur le terrain – au plus près des besoins', 'center', 
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
 SELECT id, '/11.png', 'Distribution – aider concrètement', 'center', 3 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/12.png', 'Équipe missionnaire – au service de la mission', 'center', 4 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
+SELECT id, '/12.png', 'Orphelins scolarisés – soutenir l’avenir de l’enfance', 'center', 4 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
 INSERT INTO event_photos (event_id, image, caption, position, sort_order)
 SELECT id, '/13.png', 'Mission – porter l’Évangile là où il est peu connu', 'center', 5 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
