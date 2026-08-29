@@ -1,15 +1,125 @@
-.events-gallery-list { display: grid; gap: 56px; }
-.event-gallery-block { padding: 28px; border: 1px solid rgba(9,31,58,.09); border-radius: 24px; background: #fff; box-shadow: 0 16px 40px rgba(9,31,58,.07); }
-.event-gallery-copy { max-width: 780px; margin-bottom: 24px; }
-.event-gallery-copy h2 { margin: 8px 0 10px; color: var(--navy); }
-.event-gallery-copy p { margin: 0; color: #69727e; line-height: 1.75; }
-.event-gallery-scroll { display: flex; gap: 18px; overflow-x: auto; padding: 4px 2px 14px; scroll-snap-type: x mandatory; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
-.event-gallery-photo { flex: 0 0 calc((100% - 36px) / 3); min-width: 260px; margin: 0; overflow: hidden; border-radius: 18px; background: #eee; scroll-snap-align: start; }
-.event-gallery-photo-image { width: 100%; aspect-ratio: 4/3; background-repeat: no-repeat; background-size: cover; background-position: center; background-color: #e8e6df; }
-.event-gallery-photo figcaption { padding: 12px 14px 15px; font-weight: 700; color: var(--navy); font-size: 14px; }
-.event-gallery-cta { padding: 38px; border-radius: 24px; background: var(--navy); color: #fff; }
-.event-gallery-cta h2 { margin: 0 0 10px; }
-.event-gallery-cta p { max-width: 700px; opacity: .82; line-height: 1.7; }
-.event-gallery-cta > div { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
-@media (max-width: 900px) { .event-gallery-photo { flex-basis: calc((100% - 18px) / 2); } }
-@media (max-width: 620px) { .event-gallery-block { padding: 20px; } .event-gallery-photo { flex-basis: 82%; min-width: 0; } .event-gallery-scroll { gap: 14px; } }
+.events-gallery-list {
+  display: grid;
+  gap: 56px;
+}
+.event-gallery-block {
+  padding: 28px 28px 16px;
+  border: 1px solid rgba(9, 31, 58, 0.09);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(9, 31, 58, 0.07);
+}
+.event-gallery-copy {
+  max-width: 780px;
+  margin-bottom: 24px;
+}
+.event-gallery-copy h2 {
+  margin: 8px 0 10px;
+  color: var(--navy);
+}
+.event-gallery-copy p {
+  margin: 0;
+  color: #69727e;
+  line-height: 1.75;
+}
+.event-gallery-scroll {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding: 4px 2px 14px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.event-gallery-photo {
+  flex: 0 0 calc((100% - 18px) / 2); /* two images visible */
+  min-width: 0; /* allow shrink */
+  margin: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #eee;
+  scroll-snap-align: start;
+}
+.event-gallery-photo-image {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-color: #e8e6df;
+}
+.event-gallery-photo figcaption {
+  padding: 12px 14px 15px;
+  font-weight: 700;
+  color: var(--navy);
+  font-size: 14px;
+}
+.event-gallery-cta {
+  padding: 28px;
+  border-radius: 10px; /* same radius as testimonial cards */
+  background: var(--navy); /* restored dark background */
+  color: #fff; /* white text for contrast */
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  width: 100%;
+  /* keep it constrained on large screens */
+  /* symmetrical left/right spacing, no top gap */
+  box-sizing: border-box;
+}
+
+@media (max-width: 620px) {
+  .event-gallery-cta {
+    padding: 20px;
+    border-radius: 8px;
+    width: calc(100% - 24px);
+    margin: 0 12px;
+  }
+}
+
+
+
+/* Duplicate CTA media query removed – responsive styling kept in the earlier block */
+.event-gallery-cta h2 {
+  margin: 0 0 10px;
+}
+.event-gallery-cta p {
+  max-width: 700px;
+  opacity: 0.82;
+  line-height: 1.7;
+}
+.event-gallery-cta > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+@media (max-width: 900px) {
+  .event-gallery-photo {
+    flex-basis: calc((100% - 18px) / 2);
+  }
+}
+@media (max-width: 620px) {
+  .event-gallery-block {
+    padding: 20px;
+  }
+    .event-gallery-photo {
+      flex-basis: 100%;
+      min-width: 0;
+    }
+  .event-gallery-scroll {
+    gap: 14px;
+  }
+}
+
+/* Additional mobile fix – single column on very small screens */
+@media (max-width: 600px) {
+  .event-gallery-photo {
+    flex-basis: 100% !important;
+    min-width: 0;
+  }
+  .event-gallery-photo-image {
+    height: 80px; /* reduce height for tiny screens */
+    aspect-ratio: auto;
+  }
+}

@@ -4,6 +4,14 @@ import { churchApi } from '../services/churchApi';
 import { eventGallery } from './eventGallery';
 import './event-gallery.css';
 
+// Helper to preload an array of image URLs
+function preloadImages(urls) {
+  urls.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+  });
+}
+
 function EventGalleryBlock({ event }) {
   return (
     <article className="event-gallery-block">
@@ -40,6 +48,13 @@ export default function EventsPage() {
     }).catch(() => {});
     return () => { active = false; };
   }, []);
+
+  // Preload all images (both remote and fallback) after events are set
+  useEffect(() => {
+    const remoteImages = events.flatMap((e) => (Array.isArray(e.photos) ? e.photos.map((p) => p.image) : []));
+    const fallbackImages = eventGallery.flatMap((e) => e.photos.map((p) => p.image));
+    preloadImages([...remoteImages, ...fallbackImages]);
+  }, [events]);
 
   const remoteEvents = events.filter((event) => Array.isArray(event.photos) && event.photos.length);
 
