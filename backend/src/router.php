@@ -18,8 +18,25 @@ function publicRoute(PDO $db, string $path, string $method): void
     if ($path === '/api/events') {
         $stmt = $db->query("SELECT e.*, CASE WHEN e.archived_at IS NOT NULL THEN 'archived' WHEN NOW() < e.start_at THEN 'upcoming' WHEN NOW() <= e.end_at THEN 'ongoing' ELSE 'past' END AS event_state, (SELECT COUNT(*) FROM event_photos p WHERE p.event_id=e.id) AS photo_count FROM events e WHERE e.status='published' AND e.archived_at IS NULL ORDER BY e.is_featured DESC, e.display_order ASC, e.start_at DESC, e.id DESC");
         $events = $stmt->fetchAll();
-        foreach ($events as &$event) $event = decorateEventMedia($event);
-        unset($event);
+        $ids = array_map(static fn($event) => (int) $event['id'], $events);
+        if ($ids) {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $photoStmt = $db->prepare("SELECT * FROM event_photos WHERE event_id IN ($placeholders) ORDER BY event_id ASC, sort_order ASC, id ASC");
+            $photoStmt->execute($ids);
+            $photosByEvent = [];
+            foreach ($photoStmt->fetchAll() as $photo) {
+                $id = (int) $photo['event_id'];
+                if (count($photosByEvent[$id] ?? []) < 12) $photosByEvent[$id][] = $photo;
+            }
+            foreach ($events as &$event) {
+                $event['photos'] = $photosByEvent[(int) $event['id']] ?? [];
+                $event = decorateEventMedia($event);
+            }
+            unset($event);
+        } else {
+            foreach ($events as &$event) $event = decorateEventMedia($event);
+            unset($event);
+        }
         jsonResponse(['data' => $events]);
     }
 
