@@ -1,0 +1,18 @@
+{
+  "name": "Gospel Break Chain Ministry",
+  "short_name": "Gospel Break Chain",
+  "description": "Ministère chrétien consacré à l’évangélisation, aux missions, à la prière et à l’accompagnement au Cameroun.",
+  "lang": "fr-FR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#081d38",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
