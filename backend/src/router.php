@@ -2,33 +2,35 @@
 
 declare(strict_types=1);
 
+function publicEventState(string $startAt, string $endAt): string
+{
+    $now = time(); $start = strtotime($startAt); $end = strtotime($endAt);
+    if ($now < $start) return 'upcoming';
+    if ($now <= $end) return 'ongoing';
+    return 'past';
+}
+
 function publicRoute(PDO $db, string $path, string $method): void
 {
     if ($method !== 'GET') return;
-
-    $routes = [
-        '/api/church' => 'church_settings',
-        '/api/ministries' => 'ministries',
-        '/api/events' => 'events',
-        '/api/testimonials' => 'testimonials',
-    ];
+    $routes=['/api/church'=>'church_settings','/api/ministries'=>'ministries','/api/events'=>'events','/api/testimonials'=>'testimonials'];
 
     if ($path === '/api/events') {
-        $stmt = $db->query("SELECT * FROM events WHERE status = 'published' ORDER BY event_date DESC, id DESC");
-        $events = $stmt->fetchAll();
-        $photos = $db->query('SELECT * FROM event_photos ORDER BY event_id DESC, sort_order ASC, id ASC')->fetchAll();
-        $byEvent = [];
-        foreach ($photos as $photo) $byEvent[(int) $photo['event_id']][] = $photo;
-        foreach ($events as &$event) $event['photos'] = $byEvent[(int) $event['id']] ?? [];
-        unset($event);
-        jsonResponse(['data' => $events]);
+        $stmt=$db->query("SELECT e.*, CASE WHEN e.archived_at IS NOT NULL THEN 'archived' WHEN NOW() < e.start_at THEN 'upcoming' WHEN NOW() <= e.end_at THEN 'ongoing' ELSE 'past' END AS event_state, (SELECT COUNT(*) FROM event_photos p WHERE p.event_id=e.id) AS photo_count FROM events e WHERE e.status='published' AND e.archived_at IS NULL ORDER BY e.is_featured DESC, e.display_order ASC, e.start_at DESC, e.id DESC");
+        $events=$stmt->fetchAll();
+        $ids=array_map(fn($event)=>(int)$event['id'],$events);
+        if($ids){
+            $placeholders=implode(',',array_fill(0,count($ids),'?'));$photoStmt=$db->prepare("SELECT * FROM event_photos WHERE event_id IN ($placeholders) ORDER BY event_id ASC, sort_order ASC, id ASC");$photoStmt->execute($ids);$photos=$photoStmt->fetchAll();$byEvent=[];$counts=[];
+            foreach($photos as $photo){$id=(int)$photo['event_id'];$counts[$id]=($counts[$id]??0)+1;if(count($byEvent[$id]??[])<12)$byEvent[$id][]=$photo;}
+            foreach($events as &$event){$id=(int)$event['id'];$event['photos']=$byEvent[$id]??[];$event['photo_count']=(int)($event['photo_count']??$counts[$id]??0);}unset($event);
+        }
+        jsonResponse(['data'=>$events]);
     }
 
-    if (!isset($routes[$path])) return;
+    if(preg_match('#^/api/events/([^/]+)$#',$path,$match)){
+        $stmt=$db->prepare("SELECT e.*, CASE WHEN e.archived_at IS NOT NULL THEN 'archived' WHEN NOW() < e.start_at THEN 'upcoming' WHEN NOW() <= e.end_at THEN 'ongoing' ELSE 'past' END AS event_state FROM events e WHERE e.slug=? AND e.status='published' AND e.archived_at IS NULL LIMIT 1");$stmt->execute([$match[1]]);$event=$stmt->fetch();if(!$event)return;
+        $photos=$db->prepare('SELECT * FROM event_photos WHERE event_id=? ORDER BY sort_order ASC,id ASC');$photos->execute([(int)$event['id']]);$event['photos']=$photos->fetchAll();jsonResponse(['data'=>$event]);
+    }
 
-    $table = $routes[$path];
-    $where = $table === 'church_settings' ? 'id = 1' : "status = 'published'";
-    $order = $table === 'testimonials' ? 'created_at DESC, id DESC' : 'id DESC';
-    $stmt = $db->query("SELECT * FROM {$table} WHERE {$where} ORDER BY {$order}");
-    jsonResponse(['data' => $stmt->fetchAll()]);
+    if(!isset($routes[$path]))return;$table=$routes[$path];$where=$table==='church_settings'?'id=1':"status='published'";$order=$table==='testimonials'?'created_at DESC,id DESC':'id DESC';$stmt=$db->query("SELECT * FROM {$table} WHERE {$where} ORDER BY {$order}");jsonResponse(['data'=>$stmt->fetchAll()]);
 }
