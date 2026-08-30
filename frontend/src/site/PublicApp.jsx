@@ -4,6 +4,7 @@ import { Footer, Header } from './components';
 import MinistryHome from './MinistryHome';
 import PrayerPage from './PrayerPage';
 import EventsPage from './EventsPage';
+import SEO from './SEO';
 import { Testimonials, Evangelism, Help, Donate } from './pages/InteractionPages';
 import { useScrollReveal } from './useScrollReveal';
 
@@ -19,7 +20,7 @@ function MotionObserver() {
 }
 
 export default function PublicApp() {
-  return <div className="public-site"><ScrollToTop /><MotionObserver /><Header /><main><Routes>
+  return <div className="public-site"><ScrollToTop /><MotionObserver /><SEO /><Header /><main><Routes>
     <Route path="/" element={<MinistryHome />} />
     <Route path="/events" element={<EventsPage />} />
     <Route path="/testimonials" element={<Testimonials />} />
