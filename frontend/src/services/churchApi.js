@@ -2,6 +2,12 @@ import { requestFailed, requestFinished, requestStarted, requestSucceeded, setup
 import '../uiStates.css';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+export const mediaUrl = (value) => {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) return value;
+  const origin = API_BASE.replace(/\/api\/?$/, '');
+  return `${origin}${value.startsWith('/') ? value : `/${value}`}`;
+};
 setupStateAccessibility();
 
 async function request(path, options = {}) {
@@ -31,32 +37,12 @@ async function requestChurchSettings() {
 }
 
 export const churchApi = {
-  health: () => request('/health'),
-  church: requestChurchSettings,
-  ministries: () => request('/ministries'),
-  events: () => request('/events'),
-  testimonials: () => request('/testimonials'),
-  submitPrayerRequest: (data) => request('/prayer-requests', { method: 'POST', body: JSON.stringify(data) }),
-  submitHelpRequest: (data) => request('/help-requests', { method: 'POST', body: JSON.stringify(data) }),
-  submitTestimonial: (data) => request('/testimonials', { method: 'POST', body: JSON.stringify(data) }),
-  submitDonation: (data) => request('/donations', { method: 'POST', body: JSON.stringify(data) }),
-  initiateDonation: (data) => request('/donations/initiate', { method: 'POST', body: JSON.stringify(data) }),
-  getDonationStatus: (ref) => request(`/donations/status?ref=${encodeURIComponent(ref)}`),
-  confirmDonation: (id, data = {}) => request(`/donations/confirm/${id}`, { method: 'POST', body: JSON.stringify(data) }),
-  login: (data) => request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
-  logout: () => request('/auth/logout', { method: 'POST' }),
-  dev: {
-    summary: () => request('/dev/summary'), database: () => request('/dev/database'), security: () => request('/dev/security'), audit: () => request('/dev/audit'),
-    system: () => request('/dev/system'), session: () => request('/dev/session'), diagnostics: () => request('/dev/diagnostics'),
-  },
+  health: () => request('/health'), church: requestChurchSettings, ministries: () => request('/ministries'), events: () => request('/events'), testimonials: () => request('/testimonials'),
+  submitPrayerRequest: (data) => request('/prayer-requests', { method: 'POST', body: JSON.stringify(data) }), submitHelpRequest: (data) => request('/help-requests', { method: 'POST', body: JSON.stringify(data) }), submitTestimonial: (data) => request('/testimonials', { method: 'POST', body: JSON.stringify(data) }), submitDonation: (data) => request('/donations', { method: 'POST', body: JSON.stringify(data) }),
+  initiateDonation: (data) => request('/donations/initiate', { method: 'POST', body: JSON.stringify(data) }), getDonationStatus: (ref) => request(`/donations/status?ref=${encodeURIComponent(ref)}`), confirmDonation: (id, data = {}) => request(`/donations/confirm/${id}`, { method: 'POST', body: JSON.stringify(data) }), login: (data) => request('/auth/login', { method: 'POST', body: JSON.stringify(data) }), logout: () => request('/auth/logout', { method: 'POST' }),
+  dev: { summary: () => request('/dev/summary'), database: () => request('/dev/database'), security: () => request('/dev/security'), audit: () => request('/dev/audit'), system: () => request('/dev/system'), session: () => request('/dev/session'), diagnostics: () => request('/dev/diagnostics') },
   admin: {
-    dashboard: () => request('/admin/dashboard'), churchSettings: () => request('/admin/church-settings'),
-    updateChurchSettings: (data) => request('/admin/church-settings', { method: 'PATCH', body: JSON.stringify(data) }),
-    list: (resource) => request(`/admin/${resource}`), get: (resource, id) => request(`/admin/${resource}/${id}`),
-    create: (resource, data) => request(`/admin/${resource}`, { method: 'POST', body: JSON.stringify(data) }),
-    update: (resource, id, data) => request(`/admin/${resource}/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-    remove: (resource, id) => request(`/admin/${resource}/${id}`, { method: 'DELETE' }),
-    upload,
-    addPhoto: (eventId, data) => request(`/admin/events/${eventId}/photos`, { method: 'POST', body: JSON.stringify(data) }),
+    dashboard: () => request('/admin/dashboard'), churchSettings: () => request('/admin/church-settings'), updateChurchSettings: (data) => request('/admin/church-settings', { method: 'PATCH', body: JSON.stringify(data) }),
+    list: (resource) => request(`/admin/${resource}`), get: (resource, id) => request(`/admin/${resource}/${id}`), create: (resource, data) => request(`/admin/${resource}`, { method: 'POST', body: JSON.stringify(data) }), update: (resource, id, data) => request(`/admin/${resource}/${id}`, { method: 'PATCH', body: JSON.stringify(data) }), remove: (resource, id) => request(`/admin/${resource}/${id}`, { method: 'DELETE' }), upload, addPhoto: (eventId, data) => request(`/admin/events/${eventId}/photos`, { method: 'POST', body: JSON.stringify(data) }),
   },
 };
