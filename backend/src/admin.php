@@ -6,12 +6,11 @@ function adminDashboard(PDO $db): void
 {
     requireAdmin($db);
 
+    // Keep dashboard metrics aligned with the current schema. Obsolete
+    // programs, sermons and gallery modules were removed from the project.
     $tables = [
         'ministries' => 'ministries',
-        'programs' => 'programs',
         'events' => 'events',
-        'sermons' => 'sermons',
-        'gallery' => 'gallery_items',
         'testimonials' => 'testimonials',
         'prayer-requests' => 'prayer_requests',
         'help-requests' => 'help_requests',
