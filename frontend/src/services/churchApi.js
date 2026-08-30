@@ -16,6 +16,14 @@ async function request(path, options = {}) {
   } catch (error) { requestFailed(method, path, error, retry); throw error; }
 }
 
+async function upload(file, folder = 'events') {
+  const form = new FormData(); form.append('file', file); form.append('folder', folder);
+  const response = await fetch(`${API_BASE}/admin/uploads`, { method: 'POST', credentials: 'include', body: form });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.message || 'Échec du téléversement.');
+  return payload;
+}
+
 async function requestChurchSettings() {
   const payload = await request('/church');
   const value = payload?.data;
@@ -48,5 +56,7 @@ export const churchApi = {
     create: (resource, data) => request(`/admin/${resource}`, { method: 'POST', body: JSON.stringify(data) }),
     update: (resource, id, data) => request(`/admin/${resource}/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
     remove: (resource, id) => request(`/admin/${resource}/${id}`, { method: 'DELETE' }),
+    upload,
+    addPhoto: (eventId, data) => request(`/admin/events/${eventId}/photos`, { method: 'POST', body: JSON.stringify(data) }),
   },
 };
