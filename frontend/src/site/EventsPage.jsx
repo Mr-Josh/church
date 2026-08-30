@@ -13,6 +13,8 @@ function coverFor(event){
   return {desktop:image,standard:image,mobile:image,thumbnail:image};
 }
 
+function hideBrokenImage(event){event.currentTarget.onerror=null;event.currentTarget.style.display='none';}
+
 function EventBlock({event,priority=false}){
   const [galleryOpen,setGalleryOpen]=useState(false),[gallery,setGallery]=useState([]),[galleryLoading,setGalleryLoading]=useState(false),[galleryError,setGalleryError]=useState('');
   const cover=coverFor(event);
@@ -29,14 +31,14 @@ function EventBlock({event,priority=false}){
   return <article className="event-gallery-block">
     <picture className="event-cover">
       <source media="(max-width: 768px)" srcSet={asset(cover.mobile||cover.standard||cover.desktop)}/>
-      <img src={asset(cover.standard||cover.desktop)} srcSet={`${asset(cover.mobile||cover.standard||cover.desktop)} 768w, ${asset(cover.standard||cover.desktop)} 1280w, ${asset(cover.desktop||cover.standard)} 1600w`} sizes="(max-width: 768px) 100vw, min(100vw, 1200px)" loading={priority?'eager':'lazy'} fetchPriority={priority?'high':undefined} decoding="async" alt={event.title||'Couverture de l’événement'} onError={e=>{e.currentTarget.src=asset(cover.thumbnail||cover.standard||cover.desktop)}}/>
+      <img src={asset(cover.standard||cover.desktop)} srcSet={`${asset(cover.mobile||cover.standard||cover.desktop)} 768w, ${asset(cover.standard||cover.desktop)} 1280w, ${asset(cover.desktop||cover.standard)} 1600w`} sizes="(max-width: 768px) 100vw, min(100vw, 1200px)" loading={priority?'eager':'lazy'} fetchPriority={priority?'high':undefined} decoding="async" alt={event.title||'Couverture de l’événement'} onError={hideBrokenImage}/>
     </picture>
     <div className="event-gallery-copy"><span className="gold-label">{labels[event.event_state]||'ACTION DE TERRAIN'}</span><h2>{event.title}</h2><p>{event.description}</p><div className="event-meta">{event.location&&<span>{event.location}</span>}<span>{formatDate(event.start_at)}</span>{event.end_at&&event.event_state==='ongoing'&&<span>Jusqu’au {formatDate(event.end_at)}</span>}</div></div>
     {event.photo_count>0&&<div className="event-gallery-toggle"><button type="button" className="btn outline" onClick={loadGallery}>{galleryOpen?'Masquer les photos':`Voir les photos (${event.photo_count})`}</button></div>}
     {galleryOpen&&<div className="event-gallery-scroll" aria-label={`Photos de ${event.title}`}>
       {galleryLoading&&<p className="event-gallery-status">Chargement de la galerie...</p>}
       {galleryError&&<p className="event-gallery-status event-gallery-error">{galleryError}</p>}
-      {!galleryLoading&&!galleryError&&gallery.map(photo=>{const media=photo.media||{full:photo.image,thumbnail:photo.thumbnail||photo.image};return <figure className="event-gallery-photo" key={`${event.id}-${photo.id}`}><a className="event-gallery-photo-link" href={asset(media.full||photo.image)} target="_blank" rel="noreferrer"><img src={asset(media.thumbnail||photo.thumbnail||photo.image)} alt={photo.caption||`Photo de ${event.title}`} loading="lazy" decoding="async" onError={e=>{e.currentTarget.src=asset(media.full||photo.image)}}/></a>{photo.caption&&<figcaption>{photo.caption}</figcaption>}</figure>})}
+      {!galleryLoading&&!galleryError&&gallery.map(photo=>{const media=photo.media||{full:photo.image,thumbnail:photo.thumbnail||photo.image};return <figure className="event-gallery-photo" key={`${event.id}-${photo.id}`}><a className="event-gallery-photo-link" href={asset(media.full||photo.image)} target="_blank" rel="noreferrer"><img src={asset(media.thumbnail||photo.thumbnail||photo.image)} alt={photo.caption||`Photo de ${event.title}`} loading="lazy" decoding="async" onError={hideBrokenImage}/></a>{photo.caption&&<figcaption>{photo.caption}</figcaption>}</figure>})}
       {!galleryLoading&&!galleryError&&!gallery.length&&<p className="event-gallery-status">Aucune photo disponible.</p>}
     </div>}
   </article>;
