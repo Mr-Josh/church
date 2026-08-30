@@ -1,0 +1,60 @@
+import React, { useEffect, useState } from 'react';
+import { churchApi } from '../services/churchApi';
+import './admin-events.css';
+
+const empty = { title:'', description:'', location:'', start_at:'', end_at:'', image:'', status:'published', is_featured:false, display_order:0 };
+const states = { upcoming:'À venir', ongoing:'En cours', past:'Terminé', archived:'Archivé' };
+
+function toInput(value) { return value ? String(value).replace(' ', 'T').slice(0,16) : ''; }
+function stateClass(state) { return `event-state ${state}`; }
+
+export default function AdminEventsPage() {
+  const [events,setEvents]=useState([]),[form,setForm]=useState(empty),[editing,setEditing]=useState(null),[selected,setSelected]=useState(null);
+  const [cover,setCover]=useState(null),[gallery,setGallery]=useState([]),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[error,setError]=useState('');
+  const load=async()=>{setLoading(true);try{const r=await churchApi.admin.list('events');setEvents(r.data||[]);}catch(e){setError(e.message);}finally{setLoading(false);}};
+  useEffect(()=>{load();},[]);
+  const reset=()=>{setEditing(null);setForm(empty);setCover(null);setGallery([]);setSelected(null);};
+  const set=(name,value)=>setForm(v=>({...v,[name]:value}));
+  const upload=async(file,folder)=>{const r=await churchApi.admin.upload(file,folder);return r.data.path;};
+  const submit=async(e)=>{e.preventDefault();setSaving(true);setError('');try{
+    let payload={...form};
+    if(editing){await churchApi.admin.update('events',editing,payload);}else{const r=await churchApi.admin.create('events',payload);setEditing(r.id);}
+    const eventId=editing||events.find(x=>x.title===form.title)?.id;
+    if(!eventId) throw new Error('Événement enregistré mais son identifiant est introuvable.');
+    const slug=(form.title||'event').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||`event-${eventId}`;
+    if(cover){const path=await upload(cover,`events/${new Date(form.start_at).getFullYear()}/${slug}`);await churchApi.admin.update('events',eventId,{image:path});}
+    for(const file of gallery){const path=await upload(file,`events/${new Date(form.start_at).getFullYear()}/${slug}`);await churchApi.admin.addPhoto(eventId,{image:path,sort_order:0});}
+    reset();await load();
+  }catch(e){setError(e.message);}finally{setSaving(false);}};
+  const edit=async(event)=>{setEditing(event.id);setForm({title:event.title||'',description:event.description||'',location:event.location||'',start_at:toInput(event.start_at||event.event_date),end_at:toInput(event.end_at||event.event_date),image:event.image||'',status:event.status||'published',is_featured:Boolean(event.is_featured),display_order:event.display_order||0});setCover(null);setGallery([]);setSelected(null);window.scrollTo({top:0,behavior:'smooth'});};
+  const archive=async(id)=>{if(!window.confirm('Archiver cet événement ?'))return;try{await churchApi.admin.remove('events',id);await load();}catch(e){setError(e.message);}};
+  const openGallery=async(event)=>{try{const r=await churchApi.admin.get('events',event.id);setSelected(r.data);}catch(e){setError(e.message);}};
+  const deletePhoto=async(id)=>{if(!window.confirm('Supprimer cette photo ?'))return;try{await churchApi.admin.remove('event-photos',id);if(selected)await openGallery(selected); }catch(e){setError(e.message);}};
+  return <div className="admin-events-page">
+    {error&&<div className="form-error dashboard-error">{error}</div>}
+    <section className="admin-panel admin-event-form">
+      <div className="event-form-head"><div><span className="dashboard-label">GESTION DU CONTENU</span><h2>{editing?'Modifier l’événement':'Créer un événement'}</h2><p className="admin-muted">Les dates déterminent automatiquement l’état public de l’événement.</p></div>{editing&&<button type="button" className="btn outline" onClick={reset}>Nouvel événement</button>}</div>
+      <form className="event-form-grid" onSubmit={submit}>
+        <label>Titre<input value={form.title} onChange={e=>set('title',e.target.value)} required /></label>
+        <label>Lieu<input value={form.location} onChange={e=>set('location',e.target.value)} placeholder="Ville, village, quartier..." /></label>
+        <label>Début<input type="datetime-local" value={form.start_at} onChange={e=>set('start_at',e.target.value)} required /></label>
+        <label>Fin<input type="datetime-local" value={form.end_at} onChange={e=>set('end_at',e.target.value)} required /></label>
+        <label className="wide">Description<textarea rows="5" value={form.description} onChange={e=>set('description',e.target.value)} /></label>
+        <label>Publication<select value={form.status} onChange={e=>set('status',e.target.value)}><option value="published">Publié</option><option value="draft">Brouillon</option></select></label>
+        <label>Ordre d’affichage<input type="number" min="0" value={form.display_order} onChange={e=>set('display_order',e.target.value)} /></label>
+        <label className="check-field"><input type="checkbox" checked={form.is_featured} onChange={e=>set('is_featured',e.target.checked)} /> Mettre en avant</label>
+        <label className="wide">Image de couverture<input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>setCover(e.target.files?.[0]||null)} /><small>JPG, PNG ou WebP. La couverture sera optimisée à l’upload.</small></label>
+        <label className="wide">Galerie photos<input type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={e=>setGallery(Array.from(e.target.files||[]))} /><small>{gallery.length} nouvelle(s) photo(s) sélectionnée(s).</small></label>
+        <div className="form-actions wide"><button className="btn" disabled={saving}>{saving?'Enregistrement...':editing?'Enregistrer les modifications':'Créer l’événement'}</button></div>
+      </form>
+    </section>
+    <section className="admin-panel"><div className="admin-list-head"><div><h2>Événements</h2><p className="admin-muted">À venir, en cours, terminés et archivés.</p></div><span>{events.length}</span></div>
+      {loading?<p className="admin-muted">Chargement...</p>:events.length===0?<p className="admin-muted">Aucun événement.</p>:<div className="event-admin-list">{events.map(event=><article key={event.id} className={event.archived_at?'is-archived':''}>
+        {event.image?<img src={event.image} alt=""/>:<div className="event-admin-placeholder">EVENT</div>}
+        <div className="event-admin-main"><div className="event-admin-title"><strong>{event.title}</strong><span className={stateClass(event.event_state)}>{states[event.event_state]||event.status}</span></div><p>{event.location||'Lieu non renseigné'} · {new Date(event.start_at||event.event_date).toLocaleString('fr-FR')}</p><small>{event.photo_count||0} photo(s) · {event.is_featured?'Mis en avant':'Standard'}</small></div>
+        <div className="row-actions"><button onClick={()=>edit(event)}>Modifier</button><button onClick={()=>openGallery(event)}>Photos</button>{!event.archived_at&&<button onClick={()=>archive(event.id)}>Archiver</button>}</div>
+      </article>)}</div>}
+    </section>
+    {selected&&<section className="admin-panel event-gallery-admin"><div className="panel-head"><div><span className="dashboard-label">GALERIE</span><h2>{selected.title}</h2></div><button className="btn outline" onClick={()=>setSelected(null)}>Fermer</button></div><div className="admin-photo-grid">{(selected.photos||[]).map(photo=><figure key={photo.id}><img src={photo.image} alt={photo.caption||''}/><figcaption><span>{photo.caption||'Sans légende'}</span><button onClick={()=>deletePhoto(photo.id)}>Supprimer</button></figcaption></figure>)}</div>{(!selected.photos||selected.photos.length===0)&&<p className="admin-muted">Aucune photo pour cet événement.</p>}</section>}
+  </div>;
+}
