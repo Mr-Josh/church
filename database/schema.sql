@@ -80,13 +80,21 @@ CREATE TABLE ministries (
 CREATE TABLE events (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(190) NOT NULL,
+    slug VARCHAR(190) NOT NULL UNIQUE,
     description TEXT NULL,
-    image VARCHAR(255) NULL,
+    image VARCHAR(500) NULL,
     event_date DATETIME NOT NULL,
+    start_at DATETIME NOT NULL,
+    end_at DATETIME NOT NULL,
     location VARCHAR(255) NULL,
     status ENUM('draft','published') NOT NULL DEFAULT 'published',
+    is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+    display_order INT NOT NULL DEFAULT 0,
+    archived_at DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_events_public_dates (status, archived_at, start_at, end_at),
+    INDEX idx_events_featured (status, is_featured, display_order, start_at)
 );
 
 CREATE TABLE event_photos (
