@@ -295,4 +295,4 @@ if ($path === '/api/donations/status' && $method === 'GET') {
     jsonResponse(['data' => $donation]);
 }
 
-jsonResponse(['message' => 'Route not found.']);
+jsonResponse(['message' => 'Route not found.'], 404);
