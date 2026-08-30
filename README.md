@@ -31,6 +31,27 @@ L’accueil est organisé autour de :
 
 La navbar est fixe et les ancres tiennent compte de sa hauteur.
 
+## SEO et performance
+
+Le frontend dispose maintenant d’un socle SEO technique :
+
+- titre et description adaptés à chaque route publique ;
+- balises Open Graph et Twitter Card ;
+- URL canonique générée à partir de l’origine réelle du site ;
+- `robots` avec `noindex` pour les routes inconnues ;
+- données structurées JSON-LD `Organization` et `WebSite` ;
+- `robots.txt` généré au build ;
+- sitemap XML généré automatiquement lorsque `VITE_SITE_URL` est défini ;
+- manifest web ;
+- cache mémoire de la configuration publique de l’organisation pendant 60 secondes afin d’éviter les requêtes répétées depuis le header, footer et contenu de page.
+
+Avant le déploiement, définir `VITE_SITE_URL` avec le vrai domaine HTTPS dans l’environnement de production. Sans cette variable, le build n’invente pas de domaine et génère seulement un `robots.txt` sans déclaration de sitemap.
+
+```bash
+VITE_SITE_URL=https://votre-domaine.tld
+npm run build
+```
+
 ## Actions et projets
 
 Les principaux axes éditoriaux sont :
@@ -116,10 +137,4 @@ npm run preview
 
 ## Git
 
-Les nouveaux développements du site du ministère sont réalisés sur :
-
-```text
-feat/ministry-site-content
-```
-
-`main` reste la branche de référence et n’est pas utilisée directement pour ces nouveaux changements.
+Les nouveaux développements du site du ministère sont réalisés directement sur `main` dans le dépôt de référence.
