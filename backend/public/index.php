@@ -6,6 +6,7 @@ $config = require __DIR__ . '/../config/config.php';
 $db = require __DIR__ . '/../config/database.php';
 require __DIR__ . '/../src/response.php';
 require __DIR__ . '/../src/auth.php';
+require __DIR__ . '/../src/media.php';
 require __DIR__ . '/../src/router.php';
 require __DIR__ . '/../src/admin.php';
 require __DIR__ . '/../src/admin_crud.php';
@@ -295,5 +296,3 @@ if ($path === '/api/donations/status' && $method === 'GET') {
 }
 
 jsonResponse(['message' => 'Route not found.'], 404);
-
-
