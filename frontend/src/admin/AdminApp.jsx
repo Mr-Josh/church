@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
 import AdminResourcePage from './AdminResourcePage';
+import AdminEventsPage from './AdminEventsPage';
 import AdminSettings from './AdminSettings';
 import AdminUsers from './AdminUsers';
 import AdminLayout from './AdminLayout';
@@ -17,8 +18,7 @@ export default function AdminApp() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/testimonials" element={<AdminResourcePage resource="testimonials" />} />
           <Route path="/admin/donations" element={<AdminDonationsPage />} />
-          <Route path="/admin/events" element={<AdminResourcePage resource="events" />} />
-          <Route path="/admin/event-photos" element={<AdminResourcePage resource="event-photos" />} />
+          <Route path="/admin/events" element={<AdminEventsPage />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
         </Route>
