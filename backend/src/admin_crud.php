@@ -53,7 +53,10 @@ function adminCrudRoute(PDO $db, string $path, string $method): void
 function listAdminEvents(PDO $db): never
 {
     $stmt = $db->query("SELECT e.*, CASE WHEN e.archived_at IS NOT NULL THEN 'archived' WHEN NOW() < e.start_at THEN 'upcoming' WHEN NOW() <= e.end_at THEN 'ongoing' ELSE 'past' END AS event_state, (SELECT COUNT(*) FROM event_photos p WHERE p.event_id = e.id) AS photo_count FROM events e ORDER BY e.archived_at IS NULL DESC, e.start_at DESC, e.id DESC");
-    jsonResponse(['data' => $stmt->fetchAll()]);
+    $events = $stmt->fetchAll();
+    foreach ($events as &$event) $event = decorateEventMedia($event);
+    unset($event);
+    jsonResponse(['data' => $events]);
 }
 
 function getAdminEvent(PDO $db, int $id): never
@@ -61,8 +64,10 @@ function getAdminEvent(PDO $db, int $id): never
     $stmt = $db->prepare("SELECT e.*, CASE WHEN e.archived_at IS NOT NULL THEN 'archived' WHEN NOW() < e.start_at THEN 'upcoming' WHEN NOW() <= e.end_at THEN 'ongoing' ELSE 'past' END AS event_state FROM events e WHERE e.id = ? LIMIT 1");
     $stmt->execute([$id]); $event = $stmt->fetch();
     if (!$event) jsonResponse(['message' => 'Event not found.'], 404);
-    $photos = $db->prepare('SELECT * FROM event_photos WHERE event_id = ? ORDER BY sort_order ASC, id ASC'); $photos->execute([$id]);
-    $event['photos'] = $photos->fetchAll(); jsonResponse(['data' => $event]);
+    $photos = $db->prepare('SELECT * FROM event_photos WHERE event_id = ? ORDER BY sort_order ASC, id ASC');
+    $photos->execute([$id]);
+    $event['photos'] = $photos->fetchAll();
+    jsonResponse(['data' => decorateEventMedia($event)]);
 }
 
 function eventSlug(string $title): string
@@ -107,12 +112,33 @@ function createAdminEvent(PDO $db, array $data): never
 
 function updateAdminEvent(PDO $db, int $id, array $data): never
 {
+    $oldImage = null;
+    if (array_key_exists('image', $data)) {
+        $current = $db->prepare('SELECT image FROM events WHERE id = ? LIMIT 1');
+        $current->execute([$id]);
+        $oldImage = $current->fetchColumn() ?: null;
+    }
+
     $allowed = ['title','description','image','location','status','is_featured','display_order','slug']; $sets = []; $values = [];
-    foreach ($allowed as $field) if (array_key_exists($field, $data)) { $sets[] = "{$field} = ?"; $values[] = $field === 'is_featured' ? (!empty($data[$field]) ? 1 : 0) : ($field === 'display_order' ? (int) $data[$field] : $data[$field]); }
-    if (array_key_exists('start_at', $data) || array_key_exists('end_at', $data)) { [$start, $end] = validateEventDates($data); $sets[] = 'start_at = ?'; $values[] = $start; $sets[] = 'end_at = ?'; $values[] = $end; $sets[] = 'event_date = ?'; $values[] = $start; }
+    foreach ($allowed as $field) if (array_key_exists($field, $data)) {
+        $sets[] = "{$field} = ?";
+        $values[] = $field === 'is_featured' ? (!empty($data[$field]) ? 1 : 0) : ($field === 'display_order' ? (int) $data[$field] : $data[$field]);
+    }
+    if (array_key_exists('start_at', $data) || array_key_exists('end_at', $data)) {
+        [$start, $end] = validateEventDates($data);
+        $sets[] = 'start_at = ?'; $values[] = $start;
+        $sets[] = 'end_at = ?'; $values[] = $end;
+        $sets[] = 'event_date = ?'; $values[] = $start;
+    }
     if (array_key_exists('slug', $data)) $values[array_search($data['slug'], $values, true)] = uniqueEventSlug($db, eventSlug((string) $data['slug']), $id);
     if (!$sets) jsonResponse(['message' => 'Aucun champ à modifier.'], 422);
-    $values[] = $id; $stmt = $db->prepare('UPDATE events SET ' . implode(', ', $sets) . ' WHERE id = ?'); $stmt->execute($values);
+    $values[] = $id;
+    $stmt = $db->prepare('UPDATE events SET ' . implode(', ', $sets) . ' WHERE id = ?');
+    $stmt->execute($values);
+
+    if (array_key_exists('image', $data) && $oldImage && $oldImage !== $data['image'] && !mediaPathStillReferenced($db, $oldImage, $id, null)) {
+        deleteMediaVariants($oldImage);
+    }
     jsonResponse(['message' => 'Événement mis à jour.']);
 }
 
@@ -129,16 +155,47 @@ function createEventPhoto(PDO $db, int $eventId, array $data): never
     $stmt->execute([$eventId, $data['image'], $data['caption'] ?? null, $data['position'] ?? null, (int) ($data['sort_order'] ?? 0)]);
     jsonResponse(['message' => 'Photo ajoutée.', 'id' => (int) $db->lastInsertId()], 201);
 }
+
 function updateEventPhoto(PDO $db, int $id, array $data): never
 {
+    $oldImage = null;
+    if (array_key_exists('image', $data)) {
+        $current = $db->prepare('SELECT image FROM event_photos WHERE id = ? LIMIT 1');
+        $current->execute([$id]);
+        $oldImage = $current->fetchColumn() ?: null;
+    }
     $allowed = ['image','caption','position','sort_order']; $sets=[]; $values=[];
     foreach ($allowed as $field) if (array_key_exists($field,$data)) { $sets[]="{$field} = ?"; $values[]=$field==='sort_order'?(int)$data[$field]:$data[$field]; }
     if (!$sets) jsonResponse(['message'=>'Aucun champ à modifier.'],422); $values[]=$id;
-    $stmt=$db->prepare('UPDATE event_photos SET '.implode(', ',$sets).' WHERE id = ?'); $stmt->execute($values); jsonResponse(['message'=>'Photo mise à jour.']);
+    $stmt=$db->prepare('UPDATE event_photos SET '.implode(', ',$sets).' WHERE id = ?'); $stmt->execute($values);
+    if (array_key_exists('image', $data) && $oldImage && $oldImage !== $data['image'] && !mediaPathStillReferenced($db, $oldImage, null, $id)) deleteMediaVariants($oldImage);
+    jsonResponse(['message'=>'Photo mise à jour.']);
 }
+
 function deleteEventPhoto(PDO $db, int $id): never
 {
-    $stmt=$db->prepare('DELETE FROM event_photos WHERE id = ?'); $stmt->execute([$id]); jsonResponse(['message'=>'Photo supprimée.']);
+    $stmt = $db->prepare('SELECT image FROM event_photos WHERE id = ? LIMIT 1');
+    $stmt->execute([$id]);
+    $image = $stmt->fetchColumn() ?: null;
+    if (!$image) jsonResponse(['message' => 'Photo introuvable.'], 404);
+
+    $delete = $db->prepare('DELETE FROM event_photos WHERE id = ?');
+    $delete->execute([$id]);
+    if (!mediaPathStillReferenced($db, $image, null, $id)) deleteMediaVariants($image);
+    jsonResponse(['message'=>'Photo supprimée.']);
+}
+
+function mediaPathStillReferenced(PDO $db, string $path, ?int $eventId, ?int $photoId): bool
+{
+    $eventSql = 'SELECT COUNT(*) FROM events WHERE image = ?' . ($eventId !== null ? ' AND id <> ?' : '');
+    $eventStmt = $db->prepare($eventSql);
+    $eventId !== null ? $eventStmt->execute([$path, $eventId]) : $eventStmt->execute([$path]);
+    if ((int) $eventStmt->fetchColumn() > 0) return true;
+
+    $photoSql = 'SELECT COUNT(*) FROM event_photos WHERE image = ?' . ($photoId !== null ? ' AND id <> ?' : '');
+    $photoStmt = $db->prepare($photoSql);
+    $photoId !== null ? $photoStmt->execute([$path, $photoId]) : $photoStmt->execute([$path]);
+    return (int) $photoStmt->fetchColumn() > 0;
 }
 
 function handleUserCrud(PDO $db, array $actor, string $method, ?int $targetId): never
