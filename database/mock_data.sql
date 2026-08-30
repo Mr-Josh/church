@@ -1,67 +1,29 @@
 USE church;
 
 INSERT INTO church_settings (id, church_name, slogan, mission, vision, address, phone, whatsapp, email, pastor_name, pastor_title, pastor_bio)
-VALUES (
-  1,
-  'Gospel Break Chain Ministry',
-  'Brisons les chaînes par le pouvoir de Christ',
-  'Porter l’Évangile du Seigneur Jésus-Christ partout où le besoin se fait sentir.',
-  'Restaurer, libérer et impacter.',
-  'Mora, Extrême-Nord, Cameroun',
-  '694880056',
-  '+237692765158',
-  'narcisse.arenthes@yahoo.fr',
-  'Jean Emmanuel',
-  'Fondateur & visionnaire du ministère',
-  'Porter l’Évangile sur le terrain, accompagner les personnes vulnérables et contribuer à la restauration des vies.'
-)
-ON DUPLICATE KEY UPDATE church_name = VALUES(church_name), slogan = VALUES(slogan), mission = VALUES(mission), vision = VALUES(vision), address = VALUES(address), phone = VALUES(phone), whatsapp = VALUES(whatsapp), email = VALUES(email), pastor_name = VALUES(pastor_name), pastor_title = VALUES(pastor_title), pastor_bio = VALUES(pastor_bio);
+VALUES (1,'Gospel Break Chain Ministry','Brisons les chaînes par le pouvoir de Christ','Porter l’Évangile du Seigneur Jésus-Christ partout où le besoin se fait sentir.','Restaurer, libérer et impacter.','Mora, Extrême-Nord, Cameroun','694880056','+237692765158','narcisse.arenthes@yahoo.fr','Jean Emmanuel','Fondateur & visionnaire du ministère','Porter l’Évangile sur le terrain, accompagner les personnes vulnérables et contribuer à la restauration des vies.')
+ON DUPLICATE KEY UPDATE church_name=VALUES(church_name),slogan=VALUES(slogan),mission=VALUES(mission),vision=VALUES(vision),address=VALUES(address),phone=VALUES(phone),whatsapp=VALUES(whatsapp),email=VALUES(email),pastor_name=VALUES(pastor_name),pastor_title=VALUES(pastor_title),pastor_bio=VALUES(pastor_bio);
 
-INSERT INTO pages (slug, title, content) VALUES
-('about', 'Un ministère envoyé sur le terrain', 'Gospel Break Chain Ministry est un ministère chrétien dédié à l’évangélisation, aux missions et à la restauration des vies.'),
-('evangelisation', 'Évangélisation', 'Porter l’Évangile auprès des peuples non atteints et des communautés qui ont encore peu accès à la Bonne Nouvelle de Jésus-Christ.')
-ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content);
+INSERT INTO pages (slug,title,content) VALUES ('about','Un ministère envoyé sur le terrain','Gospel Break Chain Ministry est un ministère chrétien dédié à l’évangélisation, aux missions et à la restauration des vies.'),('evangelisation','Évangélisation','Porter l’Évangile auprès des peuples non atteints et des communautés qui ont encore peu accès à la Bonne Nouvelle de Jésus-Christ.') ON DUPLICATE KEY UPDATE title=VALUES(title),content=VALUES(content);
+INSERT INTO ministries (name,slug,description) VALUES ('Évangélisation & missions','evangelisation-missions','Aller vers les peuples non atteints et les communautés difficiles d’accès.'),('Enfance & solidarité','enfance-solidarite','Scolariser et accompagner les orphelins et demi-orphelins victimes de guerre.'),('Relation d’aide chrétienne','relation-aide','Écouter, accompagner, soutenir et prier pour les personnes en période de crise.') ON DUPLICATE KEY UPDATE name=VALUES(name),description=VALUES(description);
+INSERT INTO testimonials (name,content,status) VALUES ('Témoignage 1','Dieu a transformé ma vie et m’a donné une nouvelle espérance.','published'),('Témoignage 2','J’ai retrouvé la paix grâce à la prière et à l’accompagnement reçu.','published');
 
-INSERT INTO ministries (name, slug, description) VALUES
-('Évangélisation & missions', 'evangelisation-missions', 'Aller vers les peuples non atteints et les communautés difficiles d’accès.'),
-('Enfance & solidarité', 'enfance-solidarite', 'Scolariser et accompagner les orphelins et demi-orphelins victimes de guerre.'),
-('Relation d’aide chrétienne', 'relation-aide', 'Écouter, accompagner, soutenir et prier pour les personnes en période de crise.')
-ON DUPLICATE KEY UPDATE name = VALUES(name), description = VALUES(description);
+INSERT INTO events (title,slug,description,image,event_date,start_at,end_at,location,status,is_featured,display_order) VALUES
+('Actions de terrain','actions-de-terrain','Retour en images sur les actions d’évangélisation, de solidarité et d’accompagnement menées sur le terrain.','/1.png','2026-08-15 09:00:00','2026-08-15 09:00:00','2026-08-15 17:00:00','Cameroun','published',0,10),
+('Enfance & solidarité','enfance-solidarite-event','Des moments consacrés aux enfants et aux familles vulnérables, avec une attention portée à l’accompagnement et à l’espérance.','/5.png','2026-08-08 10:00:00','2026-08-08 10:00:00','2026-08-08 16:00:00','Cameroun','published',0,20),
+('Mission & accompagnement','mission-accompagnement','Des équipes engagées auprès des communautés pour annoncer l’Évangile, écouter, accompagner et servir.','/9.png','2026-08-01 09:00:00','2026-08-01 09:00:00','2026-08-01 17:00:00','Cameroun','published',0,30)
+ON DUPLICATE KEY UPDATE description=VALUES(description),image=VALUES(image),event_date=VALUES(event_date),start_at=VALUES(start_at),end_at=VALUES(end_at),location=VALUES(location),status=VALUES(status),is_featured=VALUES(is_featured),display_order=VALUES(display_order);
 
-INSERT INTO testimonials (name, content, status) VALUES
-('Témoignage 1', 'Dieu a transformé ma vie et m’a donné une nouvelle espérance.', 'published'),
-('Témoignage 2', 'J’ai retrouvé la paix grâce à la prière et à l’accompagnement reçu.', 'published');
-
-INSERT INTO events (title, description, image, event_date, location, status) VALUES
-('Actions de terrain', 'Retour en images sur les actions d’évangélisation, de solidarité et d’accompagnement menées sur le terrain.', '/1.png', '2026-08-15 09:00:00', 'Cameroun', 'published'),
-('Enfance & solidarité', 'Des moments consacrés aux enfants et aux familles vulnérables, avec une attention portée à l’accompagnement et à l’espérance.', '/5.png', '2026-08-08 10:00:00', 'Cameroun', 'published'),
-('Mission & accompagnement', 'Des équipes engagées auprès des communautés pour annoncer l’Évangile, écouter, accompagner et servir.', '/9.png', '2026-08-01 09:00:00', 'Cameroun', 'published');
-
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/1.png', 'Visite de terrain – présence auprès des familles', 'center', 1 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/2.png', 'Rassemblement villageois – aller vers les gens', 'center', 2 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/3.png', 'Soirée d’évangélisation – proclamation et prière', 'center', 3 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/4.png', 'Femmes et enfants – écoute et encouragement', 'center', 4 FROM events WHERE title = 'Actions de terrain' LIMIT 1;
-
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/5.png', 'Enfants – l’avenir nous tient à cœur', 'center', 1 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/6.png', 'Action communautaire – présence auprès des familles', 'center', 2 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/7.png', 'Solidarité – chaque enfant compte', 'center', 3 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/8.png', 'Accompagnement – restaurer l’espérance', 'center', 4 FROM events WHERE title = 'Enfance & solidarité' LIMIT 1;
-
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/9.png', 'Rencontre – accompagner les communautés', 'center', 1 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/10.png', 'Sur le terrain – au plus près des besoins', 'center', 2 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/11.png', 'Distribution – aider concrètement', 'center', 3 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/12.png', 'Équipe missionnaire – au service de la mission', 'center', 4 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
-INSERT INTO event_photos (event_id, image, caption, position, sort_order)
-SELECT id, '/13.png', 'Mission – porter l’Évangile là où il est peu connu', 'center', 5 FROM events WHERE title = 'Mission & accompagnement' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/1.png','Visite de terrain – présence auprès des familles','center',1 FROM events WHERE slug='actions-de-terrain' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/2.png','Rassemblement villageois – aller vers les gens','center',2 FROM events WHERE slug='actions-de-terrain' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/3.png','Soirée d’évangélisation – proclamation et prière','center',3 FROM events WHERE slug='actions-de-terrain' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/4.png','Femmes et enfants – écoute et encouragement','center',4 FROM events WHERE slug='actions-de-terrain' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/5.png','Enfants – l’avenir nous tient à cœur','center',1 FROM events WHERE slug='enfance-solidarite-event' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/6.png','Action communautaire – présence auprès des familles','center',2 FROM events WHERE slug='enfance-solidarite-event' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/7.png','Solidarité – chaque enfant compte','center',3 FROM events WHERE slug='enfance-solidarite-event' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/8.png','Accompagnement – restaurer l’espérance','center',4 FROM events WHERE slug='enfance-solidarite-event' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/9.png','Rencontre – accompagner les communautés','center',1 FROM events WHERE slug='mission-accompagnement' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/10.png','Sur le terrain – au plus près des besoins','center',2 FROM events WHERE slug='mission-accompagnement' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/11.png','Distribution – aider concrètement','center',3 FROM events WHERE slug='mission-accompagnement' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/12.png','Équipe missionnaire – au service de la mission','center',4 FROM events WHERE slug='mission-accompagnement' LIMIT 1;
+INSERT INTO event_photos (event_id,image,caption,position,sort_order) SELECT id,'/13.png','Mission – porter l’Évangile là où il est peu connu','center',5 FROM events WHERE slug='mission-accompagnement' LIMIT 1;
